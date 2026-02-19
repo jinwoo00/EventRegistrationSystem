@@ -1,4 +1,4 @@
-html {
+/*html {
   font-size: 14px;
 }
 
@@ -28,4 +28,80 @@ body {
 
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
+}
+.toast-container {
+    z-index: 1056;
+}
+
+.toast {
+    min-width: 300px;
+    margin-bottom: 10px;
+}
+*/
+.gradient-bg {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.hover-scale {
+    transition: transform 0.3s ease;
+}
+
+    .hover-scale:hover {
+        transform: scale(1.05);
+    }
+
+.glass-effect {
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.8);
+}
+
+.shadow-soft {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.animation-delay-2000 {
+    animation-delay: 2s;
+}
+
+/* Fix for main content spacing */
+main {
+    padding-top: 0 !important;
+}
+
+/* Ensure proper z-index for nav */
+nav {
+    z-index: 50;
+}
+/* Hide browser's default password reveal button */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+    display: none;
+}
+
+/* For Chrome, Edge, and Safari */
+input[type="password"]::-webkit-credentials-auto-fill-button,
+input[type="password"]::-webkit-textfield-decoration-container {
+    display: none !important;
+}
+/* Highlight invalid fields with red border */
+.input-validation-error {
+    border-color: #f43f5e !important; /* rose-500 */
+    --tw-ring-color: #f43f5e !important;
+}
+
+    .input-validation-error:focus {
+        border-color: #f43f5e !important;
+        --tw-ring-color: #f43f5e !important;
+    }
+/* Style validation messages */
+.field-validation-error {
+    color: #f43f5e;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    display: block;
+}
+/* Ensure required fields are marked */
+.required:after {
+    content: " *";
+    color: #f43f5e;
 }

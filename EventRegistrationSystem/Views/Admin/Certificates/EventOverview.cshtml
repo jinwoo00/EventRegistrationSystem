@@ -1,0 +1,70 @@
+﻿@model EventRegistrationSystem.Repositories.PagedResult<EventRegistrationSystem.DTOs.EventRegistrationSummaryDTO>
+
+@{
+    ViewData["Title"] = "Certificates Overview";
+    Layout = "_AdminLayout";
+
+    var routeParams = new Dictionary<string, object>();
+}
+
+<div class="flex-1 overflow-y-auto dashboard-scroll bg-slate-50 p-6">
+    <div class="max-w-7xl mx-auto">
+        <div class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-6 mb-8 shadow-lg">
+            <h1 class="text-3xl font-bold text-white">Certificates</h1>
+            <p class="text-indigo-100 mt-1">Select an event to manage certificates.</p>
+        </div>
+
+        @if (!Model.Items.Any())
+        {
+            <div class="text-center py-16">
+                <i class="fas fa-certificate text-slate-300 text-6xl mb-4"></i>
+                <h3 class="text-xl font-semibold text-slate-700">No events found</h3>
+                <p class="text-slate-500 mt-2">Create your first event to get started.</p>
+            </div>
+        }
+        else
+        {
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                @foreach (var ev in Model.Items)
+                {
+                    <div class="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden hover:shadow-lg transition">
+                        @if (!string.IsNullOrEmpty(ev.ImageUrl))
+                        {
+                            <img src="@ev.ImageUrl" alt="@ev.EventTitle" class="h-40 w-full object-cover" />
+                        }
+                        else
+                        {
+                            <div class="h-40 w-full bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center">
+                                <i class="fas fa-calendar text-indigo-400 text-4xl"></i>
+                            </div>
+                        }
+                        <div class="p-5">
+                            <h2 class="text-xl font-bold text-slate-800 mb-2">@ev.EventTitle</h2>
+                            <p class="text-sm text-slate-500 mb-3">@ev.EventStartDate.ToString("MMM dd, yyyy") · @ev.EventLocation</p>
+
+                            <div class="flex justify-between text-sm mb-3">
+                                <span class="text-slate-600">Registrations:</span>
+                                <span class="font-semibold text-indigo-700">@ev.TotalRegistrations</span>
+                            </div>
+                            <div class="flex justify-between text-sm mb-3">
+                                <span class="text-slate-600">Checked in:</span>
+                                <span class="font-semibold text-emerald-700">@ev.CheckedInCount</span>
+                            </div>
+                            <div class="flex justify-between text-sm mb-4">
+                                <span class="text-slate-600">Certificates Issued:</span>
+                                <span class="font-semibold text-purple-700">@ev.CertificatesIssued</span>
+                            </div>
+
+                            <a asp-action="Index" asp-route-eventId="@ev.EventId"
+                               class="block w-full text-center bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition">
+                                <i class="fas fa-certificate mr-2"></i>View Certificates
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <partial name="_Pagination" model="Model" view-data='new ViewDataDictionary(ViewData) { { "routeParams", routeParams } }' />
+        }
+    </div>
+</div>

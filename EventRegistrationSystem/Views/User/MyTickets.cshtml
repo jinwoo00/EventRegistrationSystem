@@ -1,0 +1,65 @@
+﻿@using EventRegistrationSystem.DTOs
+@model IEnumerable<UserRegistrationDTO>
+@{
+    ViewData["Title"] = "My Tickets";
+    Layout = "_UserLayout";
+}
+
+<div class="max-w-7xl mx-auto px-4">
+    <div class="bg-gradient-to-r from-indigo-600 to-purple-600 py-12 px-6 rounded-2xl shadow-lg">
+        <h1 class="text-3xl font-bold text-white">My Tickets</h1>
+        <p class="text-indigo-100 mt-2">View your registered events and QR codes for check‑in.</p>
+    </div>
+</div>
+
+<div class="max-w-7xl mx-auto px-4 py-8">
+    @if (!Model.Any())
+    {
+        <div class="text-center py-12 bg-white rounded-2xl shadow-sm">
+            <i class="fas fa-ticket-alt text-slate-300 text-6xl mb-4"></i>
+            <h3 class="text-xl font-semibold text-slate-700">No tickets yet</h3>
+            <p class="text-slate-500 mt-2">Browse events and register to get your QR code.</p>
+            <a asp-controller="UserDashboard" asp-action="Index" class="mt-4 inline-block bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700">Browse Events</a>
+        </div>
+    }
+    else
+    {
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            @foreach (var reg in Model)
+            {
+                <div class="bg-white rounded-2xl shadow-md overflow-hidden border border-slate-200">
+                    <div class="p-5">
+                        <h2 class="text-xl font-bold text-slate-800 mb-2">@reg.EventTitle</h2>
+                        <div class="space-y-2 text-sm text-slate-600 mb-4">
+                            <div><i class="fas fa-calendar-day w-5 text-indigo-500"></i> @reg.EventStartDate.ToString("dddd, MMM dd, yyyy · h:mm tt")</div>
+                            <div><i class="fas fa-map-marker-alt w-5 text-amber-500"></i> @reg.EventLocation</div>
+                            <div><i class="fas fa-clock w-5 text-emerald-500"></i> Registered: @reg.RegisteredAt.ToString("MMM dd")</div>
+                            <div>
+                                @if (reg.IsCheckedIn)
+                                {
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        <i class="fas fa-check-circle mr-1"></i> Checked in @(reg.CheckedInAt?.ToString("h:mm tt") ?? "")
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600">
+                                        <i class="fas fa-clock mr-1"></i> Not checked in
+                                    </span>
+                                }
+                            </div>
+                        </div>
+                        <div class="flex justify-center my-4">
+                            <img src="@Url.Action("TicketQr", "Registration", new { 
+                                registrationId = reg.RegistrationId, 
+                                t = DateTime.Now.Ticks 
+                             })" 
+                             alt="QR Code" class="h-40 w-40" />
+                        </div>
+                        <p class="text-xs text-center text-slate-500">Scan this code at the event for check‑in.</p>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

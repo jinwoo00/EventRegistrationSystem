@@ -1,8 +1,346 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Event Registration System";
+    Layout = "_Layout";
 }
+<!-- Hero Section -->
+<section class="pt-32 pb-20 gradient-bg text-white rounded">
+    <div class="container mx-auto px-6">
+        <div class="flex flex-col md:flex-row items-center">
+            <div class="md:w-1/2 mb-12 md:mb-0">
+                <h1 class="text-5xl md:text-6xl font-bold leading-tight mb-6 animate__animated animate__fadeInUp">
+                    Streamline Your Event Registration
+                </h1>
+                <p class="text-xl text-blue-100 mb-8 animate__animated animate__fadeInUp animate__delay-1s">
+                    Easy, secure, and efficient event registration with OTP verification.
+                    Manage attendees, send confirmations, and grow your events.
+                </p>
+                <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6 animate__animated animate__fadeInUp animate__delay-2s">
+                    <a asp-controller="Account" asp-action="Register"
+                       class="px-8 py-4 bg-white text-blue-600 font-bold rounded-lg text-lg hover:bg-blue-50 hover-scale text-center">
+                        <i class="fas fa-rocket mr-2"></i>Start Free Trial
+                    </a>
+                    <a href="#features"
+                       class="px-8 py-4 border-2 border-white text-white font-bold rounded-lg text-lg hover:bg-white/10 hover-scale text-center">
+                        <i class="fas fa-play-circle mr-2"></i>Watch Demo
+                    </a>
+                </div>
+                <p class="mt-6 text-blue-100">
+                    <i class="fas fa-check-circle mr-2"></i>No credit card required • 30-day free trial
+                </p>
+            </div>
+            <div class="md:w-1/2 animate__animated animate__fadeInRight animate__delay-1s">
+                <div class="relative">
+                    <div class="absolute -top-6 -left-6 w-72 h-72 bg-blue-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse"></div>
+                    <div class="absolute -bottom-8 -right-4 w-72 h-72 bg-purple-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse animation-delay-2000"></div>
+                    <div class="relative bg-white p-8 rounded-2xl shadow-2xl">
+                        <img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                             alt="Event Registration Dashboard"
+                             class="rounded-xl shadow-lg w-full">
+                        <div class="absolute -bottom-6 -right-6 bg-blue-600 p-6 rounded-2xl shadow-xl">
+                            <div class="text-center">
+                                <div class="text-3xl font-bold text-white">10K+</div>
+                                <div class="text-blue-100">Events Managed</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<!-- Features Section -->
+<section id="features" class="py-20 bg-white">
+    <div class="container mx-auto px-6">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl font-bold text-gray-800 mb-4">Powerful Features</h2>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                Everything you need to manage successful events from registration to follow-up
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Feature 1 -->
+            <div class="bg-gray-50 p-8 rounded-2xl shadow-soft hover-scale border border-gray-100">
+                <div class="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mb-6">
+                    <i class="fas fa-shield-alt text-blue-600 text-3xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">Secure OTP Verification</h3>
+                <p class="text-gray-600 mb-6">
+                    Protect against fake registrations with email-based OTP verification.
+                    Ensure only genuine attendees register for your events.
+                </p>
+                <ul class="space-y-2">
+                    <li class="flex items-center">
+                        <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                        <span>Email verification</span>
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                        <span>10-minute OTP expiry</span>
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                        <span>Resend OTP functionality</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Feature 2 -->
+            <div class="bg-gray-50 p-8 rounded-2xl shadow-soft hover-scale border border-gray-100">
+                <div class="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center mb-6">
+                    <i class="fas fa-user-check text-purple-600 text-3xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">Attendee Management</h3>
+                <p class="text-gray-600 mb-6">
+                    Comprehensive attendee profiles with personal information,
+                    registration history, and communication preferences.
+                </p>
+                <ul class="space-y-2">
+                    <li class="flex items-center">
+                        <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                        <span>Detailed profiles</span>
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                        <span>Registration tracking</span>
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                        <span>Communication tools</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Feature 3 -->
+            <div class="bg-gray-50 p-8 rounded-2xl shadow-soft hover-scale border border-gray-100">
+                <div class="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mb-6">
+                    <i class="fas fa-envelope-open-text text-green-600 text-3xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">Email Automation</h3>
+                <p class="text-gray-600 mb-6">
+                    Automated email confirmations, reminders, and follow-ups.
+                    Keep attendees engaged before, during, and after events.
+                </p>
+                <ul class="space-y-2">
+                    <li class="flex items-center">
+                        <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                        <span>Instant confirmations</span>
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                        <span>Reminder emails</span>
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                        <span>Post-event follow-ups</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section id="how-it-works" class="py-20 bg-gray-50">
+    <div class="container mx-auto px-6">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl font-bold text-gray-800 mb-4">How It Works</h2>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                Simple 4-step process from registration to event attendance
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <!-- Step 1 -->
+            <div class="relative">
+                <div class="bg-white p-8 rounded-2xl shadow-soft text-center relative z-10">
+                    <div class="w-20 h-20 bg-blue-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">
+                        1
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Register</h3>
+                    <p class="text-gray-600">
+                        Create your account with email, name, and basic information
+                    </p>
+                </div>
+                <div class="hidden lg:block absolute top-1/2 left-full transform -translate-y-1/2 w-16">
+                    <i class="fas fa-arrow-right text-blue-400 text-3xl"></i>
+                </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="relative">
+                <div class="bg-white p-8 rounded-2xl shadow-soft text-center relative z-10">
+                    <div class="w-20 h-20 bg-blue-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">
+                        2
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Verify Email</h3>
+                    <p class="text-gray-600">
+                        Receive OTP via email and verify your account
+                    </p>
+                </div>
+                <div class="hidden lg:block absolute top-1/2 left-full transform -translate-y-1/2 w-16">
+                    <i class="fas fa-arrow-right text-blue-400 text-3xl"></i>
+                </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="relative">
+                <div class="bg-white p-8 rounded-2xl shadow-soft text-center relative z-10">
+                    <div class="w-20 h-20 bg-blue-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">
+                        3
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Browse Events</h3>
+                    <p class="text-gray-600">
+                        Explore upcoming events and select ones to attend
+                    </p>
+                </div>
+                <div class="hidden lg:block absolute top-1/2 left-full transform -translate-y-1/2 w-16">
+                    <i class="fas fa-arrow-right text-blue-400 text-3xl"></i>
+                </div>
+            </div>
+
+            <!-- Step 4 -->
+            <div>
+                <div class="bg-white p-8 rounded-2xl shadow-soft text-center">
+                    <div class="w-20 h-20 bg-blue-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">
+                        4
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Attend Event</h3>
+                    <p class="text-gray-600">
+                        Receive confirmation and attend your registered events
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials -->
+<section id="testimonials" class="py-20 bg-white">
+    <div class="container mx-auto px-6">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl font-bold text-gray-800 mb-4">What Our Users Say</h2>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                Trusted by event organizers worldwide
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Testimonial 1 -->
+            <div class="bg-gray-50 p-8 rounded-2xl shadow-soft">
+                <div class="flex items-center mb-6">
+                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-user text-blue-600 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h4 class="font-bold text-gray-800">Sarah Johnson</h4>
+                        <p class="text-blue-600">Event Manager, TechCon</p>
+                    </div>
+                </div>
+                <p class="text-gray-600 italic">
+                    "The OTP verification system eliminated fake registrations completely.
+                    Our event attendance accuracy improved by 95%!"
+                </p>
+                <div class="mt-4 text-yellow-400">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </div>
+            </div>
+
+            <!-- Testimonial 2 -->
+            <div class="bg-gray-50 p-8 rounded-2xl shadow-soft">
+                <div class="flex items-center mb-6">
+                    <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-user text-purple-600 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h4 class="font-bold text-gray-800">Michael Chen</h4>
+                        <p class="text-blue-600">University Coordinator</p>
+                    </div>
+                </div>
+                <p class="text-gray-600 italic">
+                    "Managing university events has never been easier. The automated emails
+                    save us hours of manual work each week."
+                </p>
+                <div class="mt-4 text-yellow-400">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star-half-alt"></i>
+                </div>
+            </div>
+
+            <!-- Testimonial 3 -->
+            <div class="bg-gray-50 p-8 rounded-2xl shadow-soft">
+                <div class="flex items-center mb-6">
+                    <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-user text-green-600 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h4 class="font-bold text-gray-800">Emma Rodriguez</h4>
+                        <p class="text-blue-600">Marketing Director</p>
+                    </div>
+                </div>
+                <p class="text-gray-600 italic">
+                    "The dashboard gives us real-time insights into registration trends.
+                    Perfect for planning our marketing campaigns."
+                </p>
+                <div class="mt-4 text-yellow-400">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-20 gradient-bg text-white">
+    <div class="container mx-auto px-6 text-center">
+        <h2 class="text-4xl md:text-5xl font-bold mb-6">
+            Ready to Transform Your Event Management?
+        </h2>
+        <p class="text-xl text-blue-100 mb-10 max-w-2xl mx-auto">
+            Join thousands of event organizers who trust our platform for secure,
+            efficient registration management.
+        </p>
+
+        <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
+            <a asp-controller="Account" asp-action="Register"
+               class="px-10 py-4 bg-white text-blue-600 font-bold rounded-lg text-lg hover:bg-blue-50 hover-scale shadow-xl">
+                <i class="fas fa-user-plus mr-2"></i>Create Free Account
+            </a>
+            <a href="#contact"
+               class="px-10 py-4 border-2 border-white text-white font-bold rounded-lg text-lg hover:bg-white/10 hover-scale">
+                <i class="fas fa-phone-alt mr-2"></i>Schedule a Demo
+            </a>
+        </div>
+
+        <div class="mt-12 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            <div>
+                <div class="text-4xl font-bold">50K+</div>
+                <div class="text-blue-100">Events Created</div>
+            </div>
+            <div>
+                <div class="text-4xl font-bold">2M+</div>
+                <div class="text-blue-100">Registrations</div>
+            </div>
+            <div>
+                <div class="text-4xl font-bold">99.9%</div>
+                <div class="text-blue-100">Uptime</div>
+            </div>
+            <div>
+                <div class="text-4xl font-bold">4.9/5</div>
+                <div class="text-blue-100">User Rating</div>
+            </div>
+        </div>
+    </div>
+</section>

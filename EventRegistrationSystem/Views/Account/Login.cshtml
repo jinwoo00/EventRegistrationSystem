@@ -1,0 +1,104 @@
+﻿@model EventRegistrationSystem.ViewModel.LoginViewModel
+
+@{
+    ViewData["Title"] = "Login";
+}
+
+<div class="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+    <div class="max-w-4xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row min-h-[550px]">
+
+        <!-- Left Panel - Branded -->
+        <div class="md:w-1/2 bg-gradient-to-br from-indigo-600 to-purple-600 text-white p-12 flex flex-col justify-center relative overflow-hidden">
+            <div class="absolute -bottom-10 -left-10 w-64 h-64 bg-indigo-400 rounded-full opacity-20"></div>
+            <div class="absolute top-20 -right-20 w-48 h-48 bg-purple-300 rounded-full opacity-10"></div>
+
+            <div class="relative z-10">
+                <h1 class="text-5xl font-bold mb-4 tracking-tight">EventFlow</h1>
+                <h2 class="text-xl font-semibold mb-6 tracking-widest uppercase">Your Events, Simplified</h2>
+                <p class="text-indigo-100 text-sm leading-relaxed">
+                    Manage registrations, track attendance, and issue certificates – all in one place.
+                    Join thousands of event organizers who trust EventFlow for seamless event management.
+                </p>
+            </div>
+        </div>
+
+        <!-- Right Panel - Login Form (unchanged) -->
+        <div class="md:w-1/2 p-12 flex flex-col justify-center bg-white">
+            <div class="mb-8">
+                <h2 class="text-4xl font-bold text-gray-800 mb-2">Sign in</h2>
+                <p class="text-gray-400 text-xs">Access your account to manage events</p>
+            </div>
+
+            <form asp-action="Login" method="post" class="space-y-4">
+                <div asp-validation-summary="All" class="text-red-500 text-xs italic"></div>
+
+                <div class="relative group">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                        </svg>
+                    </span>
+                    <input asp-for="Email" placeholder="Email"
+                           class="w-full pl-10 pr-4 py-3 bg-gray-100 border-none rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all" />
+                </div>
+
+                <div class="relative group">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                        </svg>
+                    </span>
+                    <input asp-for="Password" type="password" id="password" placeholder="Password"
+                           class="w-full pl-10 pr-4 py-3 bg-gray-100 border-none rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all" />
+                    <button type="button" id="toggle-password"
+                            class="absolute inset-y-0 right-0 pr-4 flex items-center text-xs font-bold text-blue-900 uppercase tracking-wide">
+                        Show
+                    </button>
+                </div>
+
+                <div class="flex items-center justify-between text-xs py-2">
+                    <label class="flex items-center text-gray-500 cursor-pointer">
+                        <input asp-for="RememberMe" type="checkbox" class="mr-2 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
+                        Remember me
+                    </label>
+                    <a asp-action="ForgotPassword" class="text-indigo-600 font-bold hover:underline">Forgot Password?</a>
+                </div>
+
+                <div class="space-y-3 pt-2">
+                    <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-xl hover:bg-indigo-700 transition-colors">
+                        Sign in
+                    </button>
+
+                    <div class="relative flex py-2 items-center">
+                        <div class="flex-grow border-t border-gray-200"></div>
+                        <span class="flex-shrink mx-4 text-gray-400 text-xs uppercase">Or</span>
+                        <div class="flex-grow border-t border-gray-200"></div>
+                    </div>
+
+                    <a asp-controller="Account"
+                       asp-action="Register"
+                       class="block text-center w-full border-2 border-gray-800 text-gray-800 font-bold py-3 rounded-xl hover:bg-gray-50 transition-colors">
+                        Create an account
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const passwordInput = document.getElementById('password');
+            const toggleButton = document.getElementById('toggle-password');
+
+            if (passwordInput && toggleButton) {
+                toggleButton.addEventListener('click', function() {
+                    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                    passwordInput.setAttribute('type', type);
+                    toggleButton.textContent = type === 'password' ? 'Show' : 'Hide';
+                });
+            }
+        });
+    </script>
+}

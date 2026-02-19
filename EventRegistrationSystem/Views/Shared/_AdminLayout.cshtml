@@ -1,0 +1,191 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using EventRegistrationSystem.Models
+@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager
+
+@{
+    var user = await UserManager.GetUserAsync(User);
+    var userName = user?.FullName ?? user?.UserName ?? "Admin";
+    var userEmail = user?.Email ?? "admin@eventflow.io";
+    var initials = string.IsNullOrEmpty(userName) ? "AD" :
+        (userName.Contains(' ') ? $"{userName.Split(' ')[0][0]}{userName.Split(' ')[1][0]}" :
+        (userName.Length >= 2 ? userName[..2] : userName)).ToUpper();
+
+    // ----- ACTIVE PAGE HELPER -----
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+    var action = ViewContext.RouteData.Values["action"]?.ToString();
+
+    bool IsActive(string targetController, string? targetAction = null)
+    {
+        var controllerMatch = string.Equals(controller, targetController, StringComparison.OrdinalIgnoreCase);
+        if (targetAction == null)
+            return controllerMatch;
+        var actionMatch = string.Equals(action, targetAction, StringComparison.OrdinalIgnoreCase);
+        return controllerMatch && actionMatch;
+    }
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5">
+    <title>EventFlow · Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    @* <script src="~/js/Chart.js" asp-append-version="true"></script> *@
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* subtle custom scroll */
+        .dashboard-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .dashboard-scroll::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        .dashboard-scroll::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 antialiased h-screen overflow-hidden">
+
+    <div class="flex h-full">
+
+        <!-- SIDEBAR – with id="sidebar" -->
+        <aside id="sidebar" class="hidden lg:flex lg:flex-shrink-0 w-72 bg-white border-r border-slate-200 flex-col h-full shadow-sm transition-all duration-300">
+            <!-- Logo & Role Badge -->
+            <div class="px-6 pt-6 pb-4 flex items-center space-x-3 border-b border-slate-100">
+                <div class="h-9 w-9 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-md">
+                    <i class="fas fa-calendar-alt text-lg"></i>
+                </div>
+                <span class="text-xl font-bold text-slate-800 tracking-tight sidebar-text">Event<span class="text-indigo-600">Flow</span></span>
+                <span class="ml-auto bg-indigo-50 text-indigo-700 text-xs font-semibold px-2.5 py-1 rounded-full border border-indigo-200">ADMIN</span>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="flex-1 px-4 pt-6 pb-4 space-y-1.5 overflow-y-auto dashboard-scroll">
+                <div class="text-xs font-semibold uppercase text-slate-400 tracking-wider px-3 mb-2 sidebar-text">Main</div>
+                <a asp-controller="Admin" asp-action="Dashboard"
+                   class="flex items-center space-x-3 px-3 py-2.5 rounded-xl font-medium transition-all @(IsActive("Admin", "Dashboard") ? "bg-indigo-50 text-indigo-700" : "text-slate-600 hover:bg-slate-100")">
+                    <i class="fas fa-tachometer-alt w-5 text-center"></i>
+                    <span class="sidebar-text">Dashboard</span>
+                </a>
+                <a asp-controller="Events" asp-action="Index"
+                   class="flex items-center space-x-3 px-3 py-2.5 rounded-xl transition @(IsActive("Events") ? "bg-indigo-50 text-indigo-700" : "text-slate-600 hover:bg-slate-100")">
+                    <i class="fas fa-calendar-plus w-5 text-center"></i>
+                    <span class="sidebar-text">Events</span>
+                </a>
+                <a asp-controller="Registrations" asp-action="EventOverview"
+                   class="flex items-center space-x-3 px-3 py-2.5 rounded-xl transition @(IsActive("Registrations") ? "bg-indigo-50 text-indigo-700" : "text-slate-600 hover:bg-slate-100")">
+                    <i class="fas fa-calendar-alt w-5 text-center"></i>
+                    <span class="sidebar-text">Registrations</span>
+                </a>
+                <a asp-controller="Attendance" asp-action="EventOverview"
+                   class="flex items-center space-x-3 px-3 py-2.5 rounded-xl transition @(IsActive("Attendance") ? "bg-indigo-50 text-indigo-700" : "text-slate-600 hover:bg-slate-100")">
+                    <i class="fas fa-qrcode w-5 text-center"></i>
+                    <span class="sidebar-text">Attendance</span>
+                </a>
+                <a asp-controller="Certificates" asp-action="EventOverview"
+                   class="flex items-center space-x-3 px-3 py-2.5 rounded-xl transition 
+                   @(IsActive("Certificates") || IsActive("CertificateSend") ? "bg-indigo-50 text-indigo-700" : "text-slate-600 hover:bg-slate-100")">
+                    <i class="fas fa-certificate w-5 text-center"></i>
+                    <span class="sidebar-text">Certificates</span>
+                </a>
+                
+
+                <!-- RBAC Info -->
+                <div class="pt-5 mt-2 border-t border-slate-200">
+                    <div class="text-xs font-semibold uppercase text-slate-400 tracking-wider px-3 mb-2 sidebar-text">Access (RBAC)</div>
+                    <div class="px-3 py-2 flex items-center space-x-2">
+                        <span class="relative flex h-3 w-3">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                        </span>
+                        <span class="text-sm font-medium text-slate-700 sidebar-text">Admin · full control</span>
+                    </div>
+                    @* <div class="px-3 py-1.5 flex items-center text-slate-600">
+                        <i class="fas fa-user-shield w-5 text-slate-500"></i>
+                        <span class="text-sm ml-3 sidebar-text">Staff (check-in)</span>
+                    </div>
+                    <div class="px-3 py-1.5 flex items-center text-slate-600">
+                        <i class="fas fa-user w-5 text-slate-500"></i>
+                        <span class="text-sm ml-3 sidebar-text">Participant (register)</span>
+                    </div> *@
+                </div>
+            </nav>
+
+            <!-- User Profile -->
+            <div class="border-t border-slate-200 p-5">
+                <div class="flex items-center space-x-3">
+                    <div class="h-9 w-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-semibold text-sm">
+                        @initials
+                    </div>
+                    <div class="flex-1 min-w-0 sidebar-text">
+                        <p class="text-sm font-semibold text-slate-800 truncate">@userName</p>
+                        <p class="text-xs text-slate-500 truncate">@userEmail</p>
+                    </div>
+                    <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" class="inline">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="text-slate-400 hover:text-slate-600 transition-colors">
+                            <i class="fas fa-sign-out-alt text-xs"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT AREA – with id="main-content" -->
+        <div id="main-content" class="flex-1 flex flex-col overflow-hidden transition-all duration-300">
+            <!-- RenderBody() now sits here, no extra <main> wrapper needed -->
+            @RenderBody()
+        </div>
+    </div>
+
+    <!-- Sidebar Toggle Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('main-content');
+            const sidebarToggle = document.getElementById('sidebar-toggle');
+
+            // Only proceed if elements exist
+            if (sidebar && mainContent && sidebarToggle) {
+                const sidebarTexts = document.querySelectorAll('.sidebar-text');
+                let collapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+
+                function updateSidebar() {
+                    if (collapsed) {
+                        sidebar.classList.add('sidebar-collapsed');
+                        mainContent.classList.add('main-content-expanded');
+                        sidebarTexts.forEach(el => el?.classList.add('hidden'));
+                        sidebarToggle.innerHTML = '<i class="fas fa-bars text-gray-600"></i>';
+                    } else {
+                        sidebar.classList.remove('sidebar-collapsed');
+                        mainContent.classList.remove('main-content-expanded');
+                        sidebarTexts.forEach(el => el?.classList.remove('hidden'));
+                        sidebarToggle.innerHTML = '<i class="fas fa-times text-gray-600"></i>';
+                    }
+                }
+
+                updateSidebar();
+
+                sidebarToggle.addEventListener('click', function() {
+                    collapsed = !collapsed;
+                    localStorage.setItem('sidebarCollapsed', collapsed);
+                    updateSidebar();
+                });
+            }
+        });
+    </script>
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

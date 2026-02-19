@@ -1,0 +1,251 @@
+﻿@model EventRegistrationSystem.ViewModel.Admin.AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "_AdminLayout";
+}
+
+<!-- SCROLLABLE MAIN CONTENT (same as Events) -->
+<main class="flex-1 overflow-y-auto dashboard-scroll bg-slate-50 p-6">
+    <div class="max-w-7xl mx-auto">
+
+        <!-- GRADIENT HEADER – exactly like Events page -->
+        <div class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-6 mb-8 shadow-lg">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-white">System overview</h1>
+                    <p class="text-indigo-100 mt-1">
+                        Real-time metrics & event operations ·
+                        <span class="font-semibold text-white">Role: @Model.CurrentUserRole (full access)</span>
+                    </p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <!-- Date & Time Badge (translucent) -->
+                    <div class="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-xl text-white flex items-center space-x-3">
+                        <i class="fas fa-calendar-day"></i>
+                        <span class="font-medium">@Model.CurrentDateTime.ToString("ddd, dd MMM yyyy")</span>
+                        <span class="w-px h-4 bg-white/30"></span>
+                        <i class="fas fa-clock"></i>
+                        <span>@Model.CurrentDateTime.ToString("hh:mm tt")</span>
+                    </div>
+                    @* <!-- Create Event Button -->
+                    <a asp-controller="Events" asp-action="Create"
+                       class="bg-white text-indigo-700 px-5 py-2.5 rounded-xl font-medium hover:bg-indigo-50 transition-all shadow-md hover:shadow-xl inline-flex items-center">
+                        <i class="fas fa-plus-circle mr-2"></i>
+                        Create event
+                    </a> *@
+                </div>
+            </div>
+        </div>
+
+        <!-- STATS CARDS (unchanged) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+            <!-- Total Events -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center">
+                <div class="h-12 w-12 rounded-xl bg-indigo-100 flex items-center justify-center text-indigo-700">
+                    <i class="fas fa-calendar-check text-2xl"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-slate-500">Total events</p>
+                    <div class="flex items-baseline">
+                        <h2 class="text-2xl font-bold text-slate-800">@Model.TotalEvents</h2>
+                        @if (Model.NewEventsThisMonth > 0)
+                        {
+                            <span class="ml-2 text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-medium">
+                                +@Model.NewEventsThisMonth this month
+                            </span>
+                        }
+                    </div>
+                </div>
+            </div>
+            <!-- Registrations -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center">
+                <div class="h-12 w-12 rounded-xl bg-amber-100 flex items-center justify-center text-amber-700">
+                    <i class="fas fa-user-plus text-2xl"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-slate-500">Registrations</p>
+                    <div class="flex items-baseline">
+                        <h2 class="text-2xl font-bold text-slate-800">@Model.TotalRegistrations.ToString("N0")</h2>
+                        @if (Model.NewRegistrationsToday > 0)
+                        {
+                            <span class="ml-2 text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-medium">
+                                +@Model.NewRegistrationsToday today
+                            </span>
+                        }
+                    </div>
+                </div>
+            </div>
+            <!-- Checked-in -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center">
+                <div class="h-12 w-12 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-700">
+                    <i class="fas fa-qrcode text-2xl"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-slate-500">Checked-in</p>
+                    <div class="flex items-baseline">
+                        <h2 class="text-2xl font-bold text-slate-800">@Model.TotalCheckedIn.ToString("N0")</h2>
+                        <span class="ml-2 text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-medium">
+                            @Model.CheckInPercentage.ToString("F1")%
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <!-- Certificates -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center">
+                <div class="h-12 w-12 rounded-xl bg-purple-100 flex items-center justify-center text-purple-700">
+                    <i class="fas fa-certificate text-2xl"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-slate-500">Certificates</p>
+                    <div class="flex items-baseline">
+                        <h2 class="text-2xl font-bold text-slate-800">@Model.CertificatesGenerated.ToString("N0")</h2>
+                        <span class="ml-2 text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-medium">
+                            PDF ready
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 📈 REGISTRATION TREND CHART -->
+        <div class="mt-10 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h3 class="text-lg font-semibold text-slate-800">📈 Registration Trend (Last 30 Days)</h3>
+                    <p class="text-sm text-slate-500">Daily registrations – growth & peak days</p>
+                </div>
+                <div class="flex items-center space-x-2 text-sm text-slate-600 bg-slate-100 px-3 py-1.5 rounded-full">
+                    <i class="fas fa-chart-line text-indigo-500"></i>
+                    <span>Total: @Model.RegistrationTrend.Sum(r => r.Count)</span>
+                </div>
+            </div>
+            <div class="relative h-72 w-full">
+                <canvas id="trendChart"></canvas>
+            </div>
+        </div>
+
+        <!-- 📊 ATTENDANCE RATE + 🥧 STATUS CHARTS (2 columns) -->
+        <div class="mt-10 grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                <div class="mb-4">
+                    <h3 class="text-lg font-semibold text-slate-800">📊 Attendance Rate Per Event</h3>
+                    <p class="text-sm text-slate-500">(Checked-in / Registered) × 100 – top 10 events</p>
+                </div>
+                <div class="relative h-80 w-full">
+                    <canvas id="eventBarChart"></canvas>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                <div class="mb-4">
+                    <h3 class="text-lg font-semibold text-slate-800">🥧 Attendance Status (Overall)</h3>
+                    <p class="text-sm text-slate-500">Checked‑in vs No‑show</p>
+                </div>
+                <div class="relative h-80 w-full flex items-center justify-center">
+                    <canvas id="statusPieChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+    </div> <!-- end max-w-7xl mx-auto -->
+</main>
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // ----- 1. Registration Trend (Line) -----
+            const trendCtx = document.getElementById('trendChart').getContext('2d');
+            const trendLabels = @Html.Raw(Json.Serialize(Model.RegistrationTrend.Select(r => r.Date)));
+            const trendData = @Html.Raw(Json.Serialize(Model.RegistrationTrend.Select(r => r.Count)));
+
+            new Chart(trendCtx, {
+                type: 'line',
+                data: {
+                    labels: trendLabels,
+                    datasets: [{
+                        label: 'Registrations',
+                        data: trendData,
+                        borderColor: '#6366f1',
+                        backgroundColor: 'rgba(99, 102, 241, 0.05)',
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        pointHoverRadius: 5,
+                        tension: 0.2,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#e2e8f0' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+
+            // ----- 2. Event Attendance Rate (Bar) -----
+            const barCtx = document.getElementById('eventBarChart').getContext('2d');
+            const eventNames = @Html.Raw(Json.Serialize(Model.EventAttendanceRates.Select(e => e.EventName)));
+            const attendancePercents = @Html.Raw(Json.Serialize(Model.EventAttendanceRates.Select(e => e.AttendancePercentage)));
+
+            new Chart(barCtx, {
+                type: 'bar',
+                data: {
+                    labels: eventNames,
+                    datasets: [{
+                        label: 'Attendance %',
+                        data: attendancePercents,
+                        backgroundColor: '#818cf8',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                afterLabel: function(context) {
+                                    const idx = context.dataIndex;
+                                    const event = @Html.Raw(Json.Serialize(Model.EventAttendanceRates));
+                                    return `Registered: ${event[idx].registered} | Checked-in: ${event[idx].checkedIn}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, max: 100, grid: { color: '#e2e8f0' } }
+                    }
+                }
+            });
+
+            // ----- 3. Attendance Status (Pie) -----
+            const pieCtx = document.getElementById('statusPieChart').getContext('2d');
+            const statusData = [
+                @Model.AttendanceStatus.CheckedIn,
+                @Model.AttendanceStatus.NoShow
+            ];
+
+            new Chart(pieCtx, {
+                type: 'pie',
+                data: {
+                    labels: ['Checked-in', 'No-show'],
+                    datasets: [{
+                        data: statusData,
+                        backgroundColor: ['#22c55e', '#ef4444'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+        });
+    </script>
+}
+

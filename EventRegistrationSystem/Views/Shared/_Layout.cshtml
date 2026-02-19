@@ -1,50 +1,317 @@
-﻿<!DOCTYPE html>
+﻿
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - EventRegistrationSystem</title>
     <script type="importmap"></script>
+    <link rel="stylesheet" href="~/EventRegistrationSystem.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/EventRegistrationSystem.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/js/site.js" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <link rel="stylesheet" href="~/css/output.css" asp-append-version="true" />
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">EventRegistrationSystem</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1056"></div>
+    <!-- Navigation -->
+    <nav class="fixed w-full z-30 top-0 glass-effect">
+        <div class="container-fluid mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <a asp-controller="Home" asp-action="Index" class="text-2xl font-bold text-blue-700">
+                        <i class="fas fa-calendar-alt mr-2"></i>Event<span class="text-blue-500">Reg</span>
+                    </a>
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#features" class="text-gray-700 hover:text-blue-600 font-medium">Features</a>
+                    <a href="#how-it-works" class="text-gray-700 hover:text-blue-600 font-medium">How It Works</a>
+                    <a href="#testimonials" class="text-gray-700 hover:text-blue-600 font-medium">Testimonials</a>
+                    <a href="#contact" class="text-gray-700 hover:text-blue-600 font-medium">Contact</a>
+
+                    @if (User.Identity?.IsAuthenticated ?? false)
+                    {
+                        <!-- Show when user IS logged in -->
+                        <div class="flex items-center space-x-4">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white">
+                                    <i class="fas fa-user text-sm"></i>
+                                </div>
+                                <span class="text-gray-700 font-medium">
+                                    @User.Identity.Name
+                                </span>
+                            </div>
+                            <form asp-controller="Account" asp-action="Logout" method="post" id="logoutForm">
+                                @Html.AntiForgeryToken()
+                                <button type="submit"
+                                        class="px-6 py-2 text-red-600 font-medium border border-red-600 rounded-lg hover:bg-red-50 transition duration-300">
+                                    Log Out
+                                </button>
+                            </form>
+                            <a asp-controller="User" asp-action="Index"
+                               class="text-slate-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium">
+                                <i class="fas fa-calendar-alt mr-1"></i>Events
+                            </a>
+                            <a asp-controller="User" asp-action="MyTickets"
+                               class="text-slate-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium">
+                                <i class="fas fa-ticket-alt mr-1"></i>My Tickets
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <!-- Show when user is NOT logged in -->
+                        <div class="flex space-x-4">
+                            <a asp-controller="Account" asp-action="Login"
+                               class="px-6 py-2 text-blue-600 font-medium border border-blue-600 rounded-lg hover:bg-blue-50 transition duration-300">
+                                Sign In
+                            </a>
+                            <a asp-controller="Account" asp-action="Register"
+                               class="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition duration-300 hover-scale">
+                                Get Started
+                            </a>
+                        </div>
+                    }
+                </div>
+
+                <!-- Mobile menu button -->
+                <button id="mobile-menu-button" class="md:hidden text-gray-700">
+                    <i class="fas fa-bars text-2xl"></i>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
+            </div>
+
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="hidden md:hidden mt-4 space-y-4">
+                <a href="#features" class="block text-gray-700 hover:text-blue-600 font-medium">Features</a>
+                <a href="#how-it-works" class="block text-gray-700 hover:text-blue-600 font-medium">How It Works</a>
+                <a href="#testimonials" class="block text-gray-700 hover:text-blue-600 font-medium">Testimonials</a>
+                <a href="#contact" class="block text-gray-700 hover:text-blue-600 font-medium">Contact</a>
+
+                <div class="pt-4 space-y-3">
+                    @if (User.Identity?.IsAuthenticated ?? false)
+                    {
+                        <!-- Show when user IS logged in (Mobile) -->
+                        <div class="flex items-center space-x-3 mb-4">
+                            <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white">
+                                <i class="fas fa-user text-sm"></i>
+                            </div>
+                            <span class="text-gray-700 font-medium">
+                                @User.Identity.Name
+                            </span>
+                        </div>
+                        <form asp-controller="Account" asp-action="Logout" method="post" id="logoutFormMobile">
+                            @Html.AntiForgeryToken()
+                            <button type="submit"
+                                    class="w-full px-6 py-2 text-center text-red-600 font-medium border border-red-600 rounded-lg hover:bg-red-50">
+                                Log Out
+                            </button>
+                        </form>
+                    }
+                    else
+                    {
+                        <!-- Show when user is NOT logged in (Mobile) -->
+                        <a asp-controller="Account" asp-action="Login"
+                           class="block px-6 py-2 text-center text-blue-600 font-medium border border-blue-600 rounded-lg hover:bg-blue-50">
+                            Sign In
+                        </a>
+                        <a asp-controller="Account" asp-action="Register"
+                           class="block px-6 py-2 text-center bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700">
+                            Get Started
+                        </a>
+                    }
                 </div>
             </div>
-        </nav>
-    </header>
-    <div class="container">
+        </div>
+    </nav>
+    <div class=" mt-20">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - EventRegistrationSystem - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <!-- Footer -->
+    <footer id="contact" class="bg-gray-900 text-white py-12">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <a href="#" class="text-2xl font-bold text-white">
+                        <i class="fas fa-calendar-alt mr-2"></i>Event<span class="text-blue-400">Reg</span>
+                    </a>
+                    <p class="mt-4 text-gray-400">
+                        Secure, efficient event registration with OTP verification.
+                        Trusted by organizations worldwide.
+                    </p>
+                    <div class="mt-6 flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white">
+                            <i class="fab fa-facebook-f text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white">
+                            <i class="fab fa-twitter text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white">
+                            <i class="fab fa-linkedin-in text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white">
+                            <i class="fab fa-instagram text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="text-lg font-bold mb-6">Quick Links</h4>
+                    <ul class="space-y-3">
+                        <li><a asp-controller="Account" asp-action="Login" class="text-gray-400 hover:text-white">Sign In</a></li>
+                        <li><a asp-controller="Account" asp-action="Register" class="text-gray-400 hover:text-white">Register</a></li>
+                        <li><a href="#features" class="text-gray-400 hover:text-white">Features</a></li>
+                        <li><a href="#testimonials" class="text-gray-400 hover:text-white">Testimonials</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-lg font-bold mb-6">Resources</h4>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-gray-400 hover:text-white">Documentation</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">API Reference</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Help Center</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Community</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-lg font-bold mb-6">Contact Us</h4>
+                    <ul class="space-y-3">
+                        <li class="flex items-center">
+                            <i class="fas fa-envelope text-blue-400 mr-3"></i>
+                            <span class="text-gray-400">support@eventreg.com</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-phone text-blue-400 mr-3"></i>
+                            <span class="text-gray-400">+1 (555) 123-4567</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-map-marker-alt text-blue-400 mr-3"></i>
+                            <span class="text-gray-400">123 Event St, San Francisco</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-500">
+                <p>&copy; @DateTime.Now.Year Event Registration System. All rights reserved.</p>
+                <p class="mt-2">
+                    <a href="#" class="hover:text-white">Privacy Policy</a> •
+                    <a href="#" class="hover:text-white">Terms of Service</a> •
+                    <a href="#" class="hover:text-white">Cookie Policy</a>
+                </p>
+            </div>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Function to show toast (using Bootstrap)
+            function showToast(message, type = 'info') {
+                const toastId = 'toast-' + Date.now();
+                const toastHtml = `
+                    <div id="${toastId}" class="toast align-items-center text-bg-${type} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                        <div class="d-flex">
+                            <div class="toast-body">
+                                ${message}
+                            </div>
+                            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                    </div>
+                `;
+
+                $('#toastContainer').append(toastHtml);
+                const toast = new bootstrap.Toast(document.getElementById(toastId));
+                toast.show();
+
+                // Remove toast after it's hidden
+                document.getElementById(toastId).addEventListener('hidden.bs.toast', function () {
+                    this.remove();
+                });
+            }
+
+            // Check for TempData messages
+            @if (TempData["Success"] != null)
+            {
+                        <text>showToast('@Html.Raw(TempData["Success"])', 'success');</text>
+            }
+            @if (TempData["Error"] != null)
+            {
+                        <text>showToast('@Html.Raw(TempData["Error"])', 'danger');</text>
+            }
+
+            // Mobile menu toggle
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            if (mobileMenuButton && mobileMenu) {
+                mobileMenuButton.addEventListener('click', () => {
+                    mobileMenu.classList.toggle('hidden');
+                    // Toggle the icon
+                    const icon = mobileMenuButton.querySelector('i');
+                    if (mobileMenu.classList.contains('hidden')) {
+                        icon.classList.remove('fa-times');
+                        icon.classList.add('fa-bars');
+                    } else {
+                        icon.classList.remove('fa-bars');
+                        icon.classList.add('fa-times');
+                    }
+                });
+            }
+
+            // Smooth scrolling for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+
+                    const targetId = this.getAttribute('href');
+                    if(targetId === '#') return;
+
+                    const targetElement = document.querySelector(targetId);
+                    if(targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 80,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+
+            // Add scroll effect to navigation
+            window.addEventListener('scroll', () => {
+                const nav = document.querySelector('nav');
+                if(window.scrollY > 100) {
+                    nav.style.backgroundColor = 'rgba(255, 255, 255, 0.98)';
+                    nav.style.boxShadow = '0 5px 20px rgba(0, 0, 0, 0.1)';
+                } else {
+                    nav.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
+                    nav.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.05)';
+                }
+            });
+
+            // Logout form confirmation - SIMPLIFIED VERSION
+            const logoutForms = document.querySelectorAll('form[action*="Logout"]');
+            logoutForms.forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    if (!confirm('Are you sure you want to log out?')) {
+                        e.preventDefault();
+                    }
+                });
+            });
+
+        });
+    </script>
 </body>
 </html>

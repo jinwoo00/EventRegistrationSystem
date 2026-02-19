@@ -1,0 +1,112 @@
+﻿@model dynamic
+@{
+    if (Model == null)
+    {
+        <div style="background:#fee2e2; color:#b91c1c; padding:10px; border-left:4px solid #ef4444;">
+            ⚠️ Pagination Error: Model is null.
+        </div>
+        return;
+    }
+
+    var routeParams = ViewData["routeParams"] as Dictionary<string, object> ?? new Dictionary<string, object>();
+    var action = ViewContext.RouteData.Values["action"]?.ToString() ?? "Index";
+}
+
+@if (Model.TotalPages > 1)
+{
+    <div class="px-6 py-4 bg-white border-t border-slate-200 flex items-center justify-between">
+        <!-- Results summary -->
+        <div class="text-sm text-slate-700">
+            Showing <span class="font-medium">@((Model.Page - 1) * Model.PageSize + 1)</span>
+            to <span class="font-medium">@(Math.Min(Model.Page * Model.PageSize, Model.TotalCount))</span>
+            of <span class="font-medium">@Model.TotalCount</span> results
+        </div>
+
+        <!-- Page navigation -->
+        <div class="flex space-x-2">
+            <!-- Previous button -->
+            @if (Model.HasPreviousPage)
+            {
+                <a href="@Url.Action(action, new Dictionary<string, object>(routeParams) { { "page", Model.Page - 1 } })"
+                   class="px-3 py-1 border border-slate-300 rounded-md text-sm font-medium text-slate-700 bg-white hover:bg-slate-50">
+                    Previous
+                </a>
+            }
+            else
+            {
+                <span class="px-3 py-1 border border-slate-200 rounded-md text-sm font-medium text-slate-400 bg-slate-50 cursor-not-allowed">
+                    Previous
+                </span>
+            }
+
+            @{
+                int maxVisiblePages = 5;
+                int startPage = Math.Max(1, Model.Page - 2);
+                int endPage = Math.Min(Model.TotalPages, startPage + maxVisiblePages - 1);
+                if (endPage - startPage + 1 < maxVisiblePages)
+                {
+                    startPage = Math.Max(1, endPage - maxVisiblePages + 1);
+                }
+            }
+
+            <!-- First page with ellipsis -->
+            @if (startPage > 1)
+            {
+                <a href="@Url.Action(action, new Dictionary<string, object>(routeParams) { { "page", 1 } })"
+                   class="px-3 py-1 border border-slate-300 rounded-md text-sm font-medium text-slate-700 bg-white hover:bg-slate-50">
+                    1
+                </a>
+                if (startPage > 2)
+                {
+                    <span class="px-3 py-1 text-slate-500">…</span>
+                }
+            }
+
+            <!-- Page numbers in window -->
+            @for (int i = startPage; i <= endPage; i++)
+            {
+                if (i == Model.Page)
+                {
+                    <span class="px-3 py-1 border border-indigo-500 rounded-md text-sm font-medium text-white bg-indigo-600">
+                        @i
+                    </span>
+                }
+                else
+                {
+                    <a href="@Url.Action(action, new Dictionary<string, object>(routeParams) { { "page", i } })"
+                       class="px-3 py-1 border border-slate-300 rounded-md text-sm font-medium text-slate-700 bg-white hover:bg-slate-50">
+                        @i
+                    </a>
+                }
+            }
+
+            <!-- Last page with ellipsis -->
+            @if (endPage < Model.TotalPages)
+            {
+                if (endPage < Model.TotalPages - 1)
+                {
+                    <span class="px-3 py-1 text-slate-500">…</span>
+                }
+                <a href="@Url.Action(action, new Dictionary<string, object>(routeParams) { { "page", Model.TotalPages } })"
+                   class="px-3 py-1 border border-slate-300 rounded-md text-sm font-medium text-slate-700 bg-white hover:bg-slate-50">
+                    @Model.TotalPages
+                </a>
+            }
+
+            <!-- Next button -->
+            @if (Model.HasNextPage)
+            {
+                <a href="@Url.Action(action, new Dictionary<string, object>(routeParams) { { "page", Model.Page + 1 } })"
+                   class="px-3 py-1 border border-slate-300 rounded-md text-sm font-medium text-slate-700 bg-white hover:bg-slate-50">
+                    Next
+                </a>
+            }
+            else
+            {
+                <span class="px-3 py-1 border border-slate-200 rounded-md text-sm font-medium text-slate-400 bg-slate-50 cursor-not-allowed">
+                    Next
+                </span>
+            }
+        </div>
+    </div>
+}

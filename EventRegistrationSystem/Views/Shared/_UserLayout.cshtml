@@ -1,0 +1,149 @@
+﻿@{
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+    var action = ViewContext.RouteData.Values["action"]?.ToString();
+
+    bool IsActive(string targetController, string targetAction = null)
+    {
+        if (targetAction == null)
+            return string.Equals(controller, targetController, StringComparison.OrdinalIgnoreCase);
+        return string.Equals(controller, targetController, StringComparison.OrdinalIgnoreCase)
+            && string.Equals(action, targetAction, StringComparison.OrdinalIgnoreCase);
+    }
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"] - EventFlow</title>
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Sidebar scroll */
+        .sidebar-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar-scroll::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        .sidebar-scroll::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 h-screen overflow-hidden">
+    <div class="flex h-full">
+        <!-- Backdrop for mobile -->
+        <div id="sidebar-backdrop" class="fixed inset-0 bg-black/30 z-40 hidden lg:hidden"></div>
+
+        <!-- Sidebar -->
+        <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 w-64 bg-white border-r border-slate-200 flex flex-col h-full shadow-lg transition-transform duration-300 z-50 -translate-x-full lg:translate-x-0">
+            <!-- Logo & Toggle (close button on mobile) -->
+            <div class="px-4 py-5 border-b border-slate-100 flex items-center justify-between">
+                <a href="/" class="text-xl font-bold text-indigo-600">EventFlow</a>
+                <button id="sidebar-close" class="lg:hidden text-slate-500 hover:text-slate-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="flex-1 px-3 py-5 overflow-y-auto sidebar-scroll">
+                <div class="space-y-1">
+                    <a asp-controller="User" asp-action="Dashboard"
+                       class="flex items-center space-x-3 px-3 py-2.5 rounded-xl transition @(IsActive("User", "Dashboard") ? "bg-indigo-50 text-indigo-700" : "text-slate-700 hover:bg-slate-100")">
+                        <i class="fas fa-tachometer-alt w-5 text-center"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a asp-controller="User" asp-action="Index"
+                       class="flex items-center space-x-3 px-3 py-2.5 rounded-xl transition @(IsActive("User", "Index") ? "bg-indigo-50 text-indigo-700" : "text-slate-700 hover:bg-slate-100")">
+                        <i class="fas fa-calendar-alt w-5 text-center"></i>
+                        <span>Events</span>
+                    </a>
+                    <a asp-controller="User" asp-action="MyTickets"
+                       class="flex items-center space-x-3 px-3 py-2.5 rounded-xl transition @(IsActive("User", "MyTickets") ? "bg-indigo-50 text-indigo-700" : "text-slate-700 hover:bg-slate-100")">
+                        <i class="fas fa-ticket-alt w-5 text-center"></i>
+                        <span>My Tickets</span>
+                    </a>
+                    <a asp-controller="User" asp-action="Certificates"
+                       class="flex items-center space-x-3 px-3 py-2.5 rounded-xl transition @(IsActive("User", "Certificates") ? "bg-indigo-50 text-indigo-700" : "text-slate-700 hover:bg-slate-100")">
+                        <i class="fas fa-certificate w-5 text-center"></i>
+                        <span>Certificates</span>
+                    </a>
+                </div>
+            </nav>
+
+            <!-- User Profile & Logout -->
+            <div class="border-t border-slate-200 p-4">
+                <div class="flex items-center space-x-3">
+                    <div class="h-9 w-9 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 border border-indigo-200">
+                        <i class="fas fa-user text-sm"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium text-slate-800 truncate">@User.Identity?.Name</p>
+                    </div>
+                    <form asp-controller="Account" asp-action="Logout" method="post" class="inline">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="text-slate-400 hover:text-slate-600 transition-colors" title="Logout">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <div class="flex-1 flex flex-col overflow-hidden w-full">
+            <!-- Top bar with hamburger menu (visible on mobile) -->
+            <header class="bg-white border-b border-slate-200 shadow-sm lg:hidden">
+                <div class="px-4 py-3 flex items-center justify-between">
+                    <button id="sidebar-toggle" class="text-slate-500 hover:text-slate-700">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                    <span class="text-lg font-bold text-indigo-600">EventFlow</span>
+                    <div class="w-6"></div> <!-- spacer -->
+                </div>
+            </header>
+
+            <!-- Page content (scrollable) -->
+            <main class="flex-1 overflow-y-auto bg-slate-50 p-4 sm:p-6">
+                @RenderBody()
+            </main>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebar-backdrop');
+            const toggle = document.getElementById('sidebar-toggle');
+            const close = document.getElementById('sidebar-close');
+
+            function openSidebar() {
+                sidebar.classList.remove('-translate-x-full');
+                if (backdrop) backdrop.classList.remove('hidden');
+            }
+
+            function closeSidebar() {
+                sidebar.classList.add('-translate-x-full');
+                if (backdrop) backdrop.classList.add('hidden');
+            }
+
+            if (toggle) toggle.addEventListener('click', openSidebar);
+            if (close) close.addEventListener('click', closeSidebar);
+            if (backdrop) backdrop.addEventListener('click', closeSidebar);
+        });
+    </script>
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

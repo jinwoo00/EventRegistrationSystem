@@ -1,0 +1,181 @@
+﻿@using EventRegistrationSystem.DTOs
+@model EventRegistrationSystem.Repositories.PagedResult<AttendanceListItemDto>
+
+@{
+    ViewData["Title"] = "Attendance";
+    Layout = "_AdminLayout";
+
+    var routeParams = new Dictionary<string, object>
+    {
+        { "eventId", Context.Request.Query["eventId"].ToString() },
+        { "search", Context.Request.Query["search"].ToString() },
+        { "checkedIn", Context.Request.Query["checkedIn"].ToString() }
+    };
+}
+
+<div class="flex-1 overflow-y-auto dashboard-scroll bg-slate-50 p-6">
+    <div class="max-w-7xl mx-auto">
+
+        <!-- Gradient Header -->
+        <div class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-6 mb-8 shadow-lg">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-white">@ViewBag.EventTitle - Attendance</h1>
+                    <p class="text-indigo-100 mt-1">Manage check‑ins and check‑outs.</p>
+                </div>
+                <a asp-action="EventOverview" class="bg-white text-indigo-700 px-5 py-2.5 rounded-xl font-medium hover:bg-indigo-50 transition shadow-md">
+                    <i class="fas fa-arrow-left mr-2"></i>Back to Events
+                </a>
+            </div>
+        </div>
+
+        <!-- Stats Summary Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center">
+                <div class="h-10 w-10 rounded-xl bg-indigo-100 flex items-center justify-center text-indigo-700">
+                    <i class="fas fa-ticket-alt text-lg"></i>
+                </div>
+                <div class="ml-3">
+                    <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Total Registrations</p>
+                    <h3 class="text-xl font-bold text-slate-800">@ViewBag.TotalRegistrations</h3>
+                </div>
+            </div>
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center">
+                <div class="h-10 w-10 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-700">
+                    <i class="fas fa-check-circle text-lg"></i>
+                </div>
+                <div class="ml-3">
+                    <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Checked In</p>
+                    <h3 class="text-xl font-bold text-slate-800">@ViewBag.CheckedInCount</h3>
+                </div>
+            </div>
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center">
+                <div class="h-10 w-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-700">
+                    <i class="fas fa-sign-out-alt text-lg"></i>
+                </div>
+                <div class="ml-3">
+                    <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Checked Out</p>
+                    <h3 class="text-xl font-bold text-slate-800">@ViewBag.CheckedOutCount</h3>
+                </div>
+            </div>
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center">
+                <div class="h-10 w-10 rounded-xl bg-amber-100 flex items-center justify-center text-amber-700">
+                    <i class="fas fa-percentage text-lg"></i>
+                </div>
+                <div class="ml-3">
+                    <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Check‑in Rate</p>
+                    <h3 class="text-xl font-bold text-slate-800">@ViewBag.CheckInPercentage%</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <form method="get" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+            <input type="hidden" name="eventId" value="@ViewBag.EventId" />
+            <div>
+                <label class="block text-xs font-medium text-slate-500 mb-1">Check‑in status</label>
+                <select name="checkedIn" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500">
+                    <option value="">All</option>
+                    <option value="false">Pending</option>
+                    <option value="true">Checked In</option>
+                </select>
+            </div>
+            <div class="md:col-span-2">
+                <label class="block text-xs font-medium text-slate-500 mb-1">Search</label>
+                <div class="relative">
+                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <input type="text" name="search" value="@Context.Request.Query["search"]"
+                           placeholder="Name, email, ticket..."
+                           class="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500" />
+                </div>
+            </div>
+            <div class="flex items-center space-x-3 md:col-span-4 justify-end">
+                <a asp-action="Index" asp-route-eventId="@ViewBag.EventId" class="px-4 py-2 border border-slate-300 rounded-lg text-slate-700 hover:bg-slate-50 transition">Clear</a>
+                <button type="submit" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition shadow-sm">
+                    <i class="fas fa-filter mr-2"></i>Apply
+                </button>
+            </div>
+        </form>
+
+        <!-- Attendance Table -->
+        <div class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-slate-200">
+                    <thead class="bg-slate-50">
+                        <tr>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase">Attendee</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase">Event</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase">Registered</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase">Checked In</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase">Checked Out</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200 bg-white">
+                        @foreach (var reg in Model.Items)
+                        {
+                            <tr class="hover:bg-slate-50 transition">
+                                <td class="px-6 py-4">
+                                    <div class="font-medium text-slate-900">@(reg.AttendeeName ?? "N/A")</div>
+                                    <div class="text-sm text-slate-500">@reg.AttendeeEmail</div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="text-sm font-medium text-slate-900">@reg.EventTitle</div>
+                                    <div class="text-xs text-slate-500">@reg.TicketType</div>
+                                </td>
+                                <td class="px-6 py-4 text-sm text-slate-600">
+                                    @reg.RegisteredAt.ToString("MMM dd, yyyy")<br />
+                                    <span class="text-xs text-slate-400">@reg.RegisteredAt.ToString("h:mm tt")</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    @if (reg.CheckedInAt.HasValue)
+                                    {
+                                        <span class="text-sm text-slate-700">@reg.CheckedInAt.Value.ToString("MMM dd, h:mm tt")</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-sm text-slate-400">—</span>
+                                    }
+                                </td>
+                                <td class="px-6 py-4">
+                                    @if (reg.CheckedOutAt.HasValue)
+                                    {
+                                        <span class="text-sm text-slate-700">@reg.CheckedOutAt.Value.ToString("MMM dd, h:mm tt")</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-sm text-slate-400">—</span>
+                                    }
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center space-x-2">
+                                        <a asp-controller="Registrations" asp-action="Details" asp-route-id="@reg.RegistrationId"
+                                           class="text-slate-500 hover:text-indigo-600 p-2 hover:bg-indigo-50 rounded-lg transition"
+                                           title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                        @if (!Model.Items.Any())
+                        {
+                            <tr>
+                                <td colspan="6" class="px-6 py-16 text-center">
+                                    <div class="inline-flex items-center justify-center h-16 w-16 rounded-full bg-slate-100 mb-4">
+                                        <i class="fas fa-calendar-times text-slate-400 text-2xl"></i>
+                                    </div>
+                                    <h3 class="text-lg font-semibold text-slate-800 mb-2">No attendees found</h3>
+                                    <p class="text-slate-500 mb-4">Try adjusting your filters.</p>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <partial name="_Pagination" model="Model" view-data='new ViewDataDictionary(ViewData) { { "routeParams", routeParams } }' />
+        </div>
+    </div>
+</div>

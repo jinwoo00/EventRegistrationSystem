@@ -1,0 +1,60 @@
+﻿@model EventRegistrationSystem.Models.Registration
+
+@{
+    ViewData["Title"] = "Registration Details";
+    Layout = "_AdminLayout";
+}
+
+<div class="flex-1 overflow-y-auto dashboard-scroll bg-slate-50 p-6">
+    <div class="max-w-3xl mx-auto">
+        <div class="flex items-center justify-between mb-6">
+            <h1 class="text-2xl font-bold text-slate-800">Registration Details</h1>
+            <a asp-action="Index" class="bg-white border border-slate-300 text-slate-700 px-4 py-2 rounded-lg hover:bg-slate-50 inline-flex items-center">
+                <i class="fas fa-arrow-left mr-2"></i>Back
+            </a>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-lg border border-slate-200 p-6">
+            <dl class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="col-span-2">
+                    <dt class="text-sm font-medium text-slate-500">Event</dt>
+                    <dd class="text-lg font-semibold text-slate-900">@Model.Event?.Title</dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-slate-500">Attendee</dt>
+                    <dd class="text-base text-slate-800">@Model.User?.FullName</dd>
+                    <dd class="text-sm text-slate-600">@Model.User?.Email</dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-slate-500">Ticket Type</dt>
+                    <dd class="text-base text-slate-800">@Model.TicketType</dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-slate-500">Registered At</dt>
+                    <dd class="text-base text-slate-800">@Model.RegisteredAt.ToString("dddd, MMMM dd, yyyy")</dd>
+                    <dd class="text-sm text-slate-600">@Model.RegisteredAt.ToString("h:mm tt")</dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-slate-500">Check‑in Status</dt>
+                    <dd>
+                        @if (Model.IsCheckedIn)
+                        {
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                <span class="h-2 w-2 bg-green-500 rounded-full mr-2"></span>
+                                Checked in
+                            </span>
+                            <span class="block text-xs text-slate-500 mt-1">@Model.CheckedInAt?.ToString("MMM dd, h:mm tt")</span>
+                        }
+                        else
+                        {
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600">
+                                <span class="h-2 w-2 bg-slate-400 rounded-full mr-2"></span>
+                                Not checked in
+                            </span>
+                        }
+                    </dd>
+                </div>
+            </dl>
+        </div>
+    </div>
+</div>

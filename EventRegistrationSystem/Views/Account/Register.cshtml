@@ -1,0 +1,284 @@
+﻿@model EventRegistrationSystem.ViewModel.RegisterViewModel
+
+@{
+    ViewData["Title"] = "Create Account";
+    Layout = "_Layout";
+}
+
+<div class="min-h-screen bg-slate-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl w-full">
+
+        <!-- Main Card -->
+        <div class="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+
+            <!-- Gradient Header -->
+            <div class="bg-gradient-to-r from-indigo-600 to-purple-600 px-8 py-6">
+                <h1 class="text-3xl font-bold text-white">Create Account</h1>
+                <p class="text-indigo-100 mt-1">Join EventFlow and start exploring events</p>
+            </div>
+
+            <!-- Form -->
+            <div class="p-8">
+                <form asp-action="Register" method="post" class="space-y-6">
+                    @Html.AntiForgeryToken()
+
+                    @* <!-- Validation Summary -->
+                    <div asp-validation-summary="All" class="text-sm text-rose-600 bg-rose-50 border border-rose-200 rounded-lg p-4"></div> *@
+
+                    <!-- Two‑column grid for most fields -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                        <!-- Full Name -->
+                        <div class="space-y-2">
+                            <label asp-for="FullName" class="block text-sm font-semibold text-slate-700">
+                                Full Name <span class="text-rose-500">*</span>
+                            </label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-user text-slate-400"></i>
+                                </div>
+                                <input asp-for="FullName"
+                                       class="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 transition shadow-sm"
+                                       placeholder="John Doe" />
+                            </div>
+                            <span asp-validation-for="FullName" class="text-sm text-rose-600"></span>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="space-y-2">
+                            <label asp-for="Email" class="block text-sm font-semibold text-slate-700">
+                                Email <span class="text-rose-500">*</span>
+                            </label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-envelope text-slate-400"></i>
+                                </div>
+                                <input asp-for="Email"
+                                       class="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 transition shadow-sm"
+                                       placeholder="you@example.com" />
+                            </div>
+                            <span asp-validation-for="Email" class="text-sm text-rose-600"></span>
+                        </div>
+
+                        <!-- Password with toggle and strength meter -->
+                        <div class="space-y-2 md:col-span-2">
+                            <label asp-for="Password" class="block text-sm font-semibold text-slate-700">
+                                Password <span class="text-rose-500">*</span>
+                            </label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-lock text-slate-400"></i>
+                                </div>
+                                <input asp-for="Password" id="password" type="password"
+                                       class="w-full pl-10 pr-16 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 transition shadow-sm"
+                                       placeholder="••••••••" />
+                                <button type="button" id="toggle-password"
+                                        class="absolute inset-y-0 right-0 pr-4 flex items-center text-xs font-bold text-indigo-600 uppercase tracking-wide">
+                                    Show
+                                </button>
+                            </div>
+                            <span asp-validation-for="Password" class="text-sm text-rose-600"></span>
+
+                            <!-- Password Strength Meter -->
+                            <div class="mt-2">
+                                <div class="flex items-center space-x-1">
+                                    <div id="strength-0" class="h-2 flex-1 rounded-full bg-slate-200"></div>
+                                    <div id="strength-1" class="h-2 flex-1 rounded-full bg-slate-200"></div>
+                                    <div id="strength-2" class="h-2 flex-1 rounded-full bg-slate-200"></div>
+                                    <div id="strength-3" class="h-2 flex-1 rounded-full bg-slate-200"></div>
+                                </div>
+                                <p id="strength-text" class="text-xs text-slate-500 mt-1">Enter a strong password</p>
+                            </div>
+                        </div>
+
+                        <!-- Confirm Password with toggle -->
+                        <div class="space-y-2 md:col-span-2">
+                            <label asp-for="ConfirmPassword" class="block text-sm font-semibold text-slate-700">
+                                Confirm Password <span class="text-rose-500">*</span>
+                            </label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-lock text-slate-400"></i>
+                                </div>
+                                <input asp-for="ConfirmPassword" id="confirm-password" type="password"
+                                       class="w-full pl-10 pr-16 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 transition shadow-sm"
+                                       placeholder="••••••••" />
+                                <button type="button" id="toggle-confirm-password"
+                                        class="absolute inset-y-0 right-0 pr-4 flex items-center text-xs font-bold text-indigo-600 uppercase tracking-wide">
+                                    Show
+                                </button>
+                            </div>
+                            <span asp-validation-for="ConfirmPassword" class="text-sm text-rose-600"></span>
+                        </div>
+
+                        <!-- Phone Number -->
+                        <div class="space-y-2">
+                            <label asp-for="PhoneNumber" class="block text-sm font-semibold text-slate-700">
+                                Phone Number
+                            </label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-phone text-slate-400"></i>
+                                </div>
+                                <input asp-for="PhoneNumber"
+                                       id="phone-number"
+                                       type="tel"
+                                       maxlength="11"
+                                       oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                                       class="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 transition shadow-sm"
+                                       placeholder="11 digits (e.g., 09123456789)" />
+                            </div>
+                            <span asp-validation-for="PhoneNumber" class="text-sm text-rose-600"></span>
+                            <!-- Optional length hint -->
+                            <p class="text-xs text-slate-500 mt-1">Enter exactly 11 digits</p>
+                        </div>
+
+                        <!-- Gender -->
+                        <div class="space-y-2">
+                            <label asp-for="Gender" class="block text-sm font-semibold text-slate-700">
+                                Gender
+                            </label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-venus-mars text-slate-400"></i>
+                                </div>
+                                <select asp-for="Gender"
+                                        class="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 transition shadow-sm appearance-none bg-white">
+                                    <option value="">Select gender</option>
+                                    <option>Male</option>
+                                    <option>Female</option>
+                                    <option>Other</option>
+                                </select>
+                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-chevron-down text-slate-400"></i>
+                                </div>
+                            </div>
+                            <span asp-validation-for="Gender" class="text-sm text-rose-600"></span>
+                        </div>
+
+                        <!-- Birth Date -->
+                        <div class="space-y-2">
+                            <label asp-for="BirthDate" class="block text-sm font-semibold text-slate-700">
+                                Birth Date
+                            </label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-calendar text-slate-400"></i>
+                                </div>
+                                <input asp-for="BirthDate" type="date"
+                                       class="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 transition shadow-sm" />
+                            </div>
+                            <span asp-validation-for="BirthDate" class="text-sm text-rose-600"></span>
+                        </div>
+
+                        <!-- Address (spans both columns) -->
+                        <div class="md:col-span-2 space-y-2">
+                            <label asp-for="Address" class="block text-sm font-semibold text-slate-700">
+                                Address
+                            </label>
+                            <div class="relative">
+                                <div class="absolute top-3 left-0 pl-3 flex items-start pointer-events-none">
+                                    <i class="fas fa-map-marker-alt text-slate-400"></i>
+                                </div>
+                                <textarea asp-for="Address" rows="3"
+                                          class="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 transition shadow-sm"
+                                          placeholder="123 Main St, City, State"></textarea>
+                            </div>
+                            <span asp-validation-for="Address" class="text-sm text-rose-600"></span>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="pt-4">
+                        <button type="submit"
+                                class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold py-3 px-6 rounded-xl hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all shadow-md hover:shadow-lg">
+                            <i class="fas fa-user-plus mr-2"></i>Create Account
+                        </button>
+                    </div>
+
+                    <!-- Login Link -->
+                    <div class="text-center text-sm text-slate-600">
+                        Already have an account?
+                        <a asp-action="Login" class="font-medium text-indigo-600 hover:text-indigo-500 transition">
+                            Sign in
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <p class="mt-6 text-center text-xs text-slate-500">
+            &copy; @DateTime.Now.Year EventFlow – Secure event registration with OTP verification
+        </p>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function() {
+            // Password show/hide toggles
+            const passwordInput = document.getElementById('password');
+            const toggleBtn = document.getElementById('toggle-password');
+            const confirmInput = document.getElementById('confirm-password');
+            const toggleConfirmBtn = document.getElementById('toggle-confirm-password');
+
+            if (toggleBtn && passwordInput) {
+                toggleBtn.addEventListener('click', function() {
+                    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                    passwordInput.setAttribute('type', type);
+                    toggleBtn.textContent = type === 'password' ? 'Show' : 'Hide';
+                });
+            }
+
+            if (toggleConfirmBtn && confirmInput) {
+                toggleConfirmBtn.addEventListener('click', function() {
+                    const type = confirmInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                    confirmInput.setAttribute('type', type);
+                    toggleConfirmBtn.textContent = type === 'password' ? 'Show' : 'Hide';
+                });
+            }
+
+            // Password strength meter
+            const strengthBars = [
+                document.getElementById('strength-0'),
+                document.getElementById('strength-1'),
+                document.getElementById('strength-2'),
+                document.getElementById('strength-3')
+            ];
+            const strengthText = document.getElementById('strength-text');
+
+            function calculateStrength(pwd) {
+                if (!pwd) return 0;
+                let score = 0;
+                // Length points
+                if (pwd.length >= 8) score += 1;
+                if (pwd.length >= 12) score += 1; // extra point for long passwords
+                // Character variety
+                if (/[a-z]/.test(pwd)) score += 1;
+                if (/[A-Z]/.test(pwd)) score += 1;
+                if (/[0-9]/.test(pwd)) score += 1;
+                if (/[^a-zA-Z0-9]/.test(pwd)) score += 1;
+                // Cap at 4
+                return Math.min(4, score);
+            }
+
+            function updateMeter(strength) {
+                const colors = ['bg-red-500', 'bg-orange-500', 'bg-yellow-500', 'bg-green-500', 'bg-green-600'];
+                const texts = ['Very weak', 'Weak', 'Fair', 'Good', 'Excellent'];
+                for (let i = 0; i < strengthBars.length; i++) {
+                    strengthBars[i].className = `h-2 flex-1 rounded-full ${i < strength ? colors[strength-1] : 'bg-slate-200'}`;
+                }
+                strengthText.textContent = strength === 0 ? 'Enter a password' : texts[strength-1];
+            }
+
+            if (passwordInput && strengthBars[0]) {
+                passwordInput.addEventListener('input', function() {
+                    const strength = calculateStrength(passwordInput.value);
+                    updateMeter(strength);
+                });
+            }
+        })();
+    </script>
+}

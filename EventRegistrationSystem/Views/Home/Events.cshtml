@@ -1,0 +1,66 @@
+﻿@model IEnumerable<EventRegistrationSystem.Models.Event>
+
+@{
+    ViewData["Title"] = "Upcoming Events";
+    Layout = "_Layout";
+}
+
+<div class="bg-gradient-to-r from-indigo-500 to-purple-600 py-16 px-4">
+    <div class="max-w-7xl mx-auto text-center">
+        <h1 class="text-4xl font-bold text-white mb-4">🎉 Upcoming Events</h1>
+        <p class="text-xl text-indigo-100">Discover and register for amazing experiences</p>
+    </div>
+</div>
+
+<div class="max-w-7xl mx-auto px-4 py-12">
+    @if (!Model.Any())
+    {
+        <div class="text-center py-12 bg-white rounded-2xl shadow-sm">
+            <i class="fas fa-calendar-times text-slate-300 text-6xl mb-4"></i>
+            <h3 class="text-xl font-semibold text-slate-700">No upcoming events</h3>
+            <p class="text-slate-500 mt-2">Check back later for new events!</p>
+        </div>
+    }
+    else
+    {
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            @foreach (var ev in Model)
+            {
+                <div class="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition">
+                    @if (!string.IsNullOrEmpty(ev.ImageUrl))
+                    {
+                        <img src="@ev.ImageUrl" alt="@ev.Title" class="h-48 w-full object-cover" />
+                    }
+                    else
+                    {
+                        <div class="h-48 w-full bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center">
+                            <i class="fas fa-calendar text-indigo-400 text-5xl"></i>
+                        </div>
+                    }
+                    <div class="p-5">
+                        <h2 class="text-xl font-bold text-slate-800 mb-2">@ev.Title</h2>
+                        <p class="text-slate-600 text-sm mb-3">@(ev.Description?.Length > 100 ? ev.Description.Substring(0, 100) + "..." : ev.Description)</p>
+                        <div class="space-y-2 text-sm text-slate-500 mb-4">
+                            <div class="flex items-center">
+                                <i class="fas fa-calendar-day w-5 text-indigo-500"></i>
+                                <span>@ev.StartDate.ToString("dddd, MMM dd, yyyy · h:mm tt")</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-map-marker-alt w-5 text-amber-500"></i>
+                                <span>@ev.Location</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-users w-5 text-emerald-500"></i>
+                                <span>Capacity: @ev.Capacity</span>
+                            </div>
+                        </div>
+                        <a asp-controller="Registration" asp-action="Register" asp-route-eventId="@ev.Id"
+                           class="block w-full text-center bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition">
+                            Register Now
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
