@@ -6,6 +6,7 @@ using EventRegistrationSystem.Services;
 using EventRegistrationSystem.ViewModel;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -20,11 +21,12 @@ namespace EventRegistrationSystem.Controllers
         private readonly IEmailService _emailService;
         private readonly ILogger<AuthRepository> _logger;
         private readonly IAuditLogService _auditLogService;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
         public AccountController(IAuthService service,
                                IMapper mapper,
                                UserManager<ApplicationUser> userManager,
-                               IEmailService emailService, ILogger<AuthRepository> logger, IAuditLogService auditLogService)
+                               IEmailService emailService, ILogger<AuthRepository> logger, IAuditLogService auditLogService, IWebHostEnvironment webHostEnvironment )
         {
             _service = service;
             _mapper = mapper;
@@ -32,6 +34,7 @@ namespace EventRegistrationSystem.Controllers
             _emailService = emailService;
             _logger = logger;
             _auditLogService = auditLogService;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         [HttpGet]
@@ -186,6 +189,25 @@ namespace EventRegistrationSystem.Controllers
                 }
 
                 var newUser = await _userManager.FindByEmailAsync(vm.Email);
+
+                // Handle profile picture upload
+                if (vm.ProfilePicture != null && vm.ProfilePicture.Length > 0)
+                {
+                    var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", "profiles");
+                    Directory.CreateDirectory(uploadsFolder);
+
+                    var uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(vm.ProfilePicture.FileName);
+                    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await vm.ProfilePicture.CopyToAsync(stream);
+                    }
+
+                    newUser.ProfilePictureUrl = $"/uploads/profiles/{uniqueFileName}";
+                    await _userManager.UpdateAsync(newUser);
+                }
+
                 await _auditLogService.LogAsync(newUser, "Register", "New account created");
 
                 TempData["Success"] = "Registration successful! Please check your email for OTP.";
@@ -193,7 +215,6 @@ namespace EventRegistrationSystem.Controllers
             }
             catch (Exception ex)
             {
-                // Log exception
                 _logger.LogError(ex, "Registration error");
                 ModelState.AddModelError("", "An unexpected error occurred.");
                 return View(vm);

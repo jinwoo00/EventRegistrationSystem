@@ -56,9 +56,10 @@
                 html5QrCode.pause();
 
                 console.log('Scanned URL:', decodedText);
+                window.location.href = decodedText;
 
                 if (!decodedText.toLowerCase().includes('/staff/processscan/')) {
-                    showToast('Invalid QR code: not a check-in URL', 'error');
+                    // showToast('Invalid QR code: not a check-in URL', 'error');
                     setTimeout(() => {
                         html5QrCode.resume();
                         scanningPaused = false;

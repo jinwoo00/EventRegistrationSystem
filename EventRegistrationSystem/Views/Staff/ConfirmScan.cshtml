@@ -1,0 +1,178 @@
+﻿@model EventRegistrationSystem.ViewModel.ScanConfirmationViewModel
+
+@{
+    ViewData["Title"] = "Confirm Attendance";
+    Layout = "_StaffLayout";
+}
+
+<div class="min-h-screen bg-slate-50 py-6 px-4">
+    <div class="max-w-4xl mx-auto">
+
+        <!-- Gradient Header -->
+        <div class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-6 mb-8 shadow-lg">
+            <h1 class="text-3xl font-bold text-white">Confirm Attendance</h1>
+            <p class="text-indigo-100 mt-1">Verify participant identity and confirm check‑in or check‑out.</p>
+        </div>
+
+        <!-- Messages -->
+        @if (TempData["ScanError"] != null)
+        {
+            <div class="mb-4 bg-rose-50 border border-rose-200 text-rose-600 px-4 py-3 rounded-lg flex items-center">
+                <i class="fas fa-exclamation-circle mr-2"></i>
+                @TempData["ScanError"]
+            </div>
+        }
+        @if (ViewBag.SuccessMessage != null)
+        {
+            <div class="mb-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg flex items-center">
+                <i class="fas fa-check-circle mr-2"></i>
+                @ViewBag.SuccessMessage
+            </div>
+        }
+        @if (ViewBag.ErrorMessage != null)
+        {
+            <div class="mb-4 bg-rose-50 border border-rose-200 text-rose-600 px-4 py-3 rounded-lg flex items-center">
+                <i class="fas fa-exclamation-circle mr-2"></i>
+                @ViewBag.ErrorMessage
+            </div>
+        }
+
+        <!-- Participant Card -->
+        <div class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden mb-6">
+            <div class="p-6">
+                <div class="flex items-center space-x-5">
+                    <!-- Profile Picture -->
+                    <div class="flex-shrink-0">
+                        @if (!string.IsNullOrEmpty(Model.ProfilePictureUrl))
+                        {
+                            <img src="@Model.ProfilePictureUrl" alt="Profile" class="h-20 w-20 rounded-full object-cover border-3 border-indigo-200 shadow-sm" />
+                        }
+                        else
+                        {
+                            <div class="h-20 w-20 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center text-indigo-700 border-3 border-indigo-200">
+                                <i class="fas fa-user text-3xl"></i>
+                            </div>
+                        }
+                    </div>
+                    <!-- Name & Email -->
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-800">@Model.AttendeeName</h2>
+                        <p class="text-sm text-slate-600 flex items-center mt-1">
+                            <i class="fas fa-envelope text-indigo-500 mr-2"></i>@Model.AttendeeEmail
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Event Details Card -->
+        <div class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden mb-6">
+            <div class="border-b border-slate-100 bg-slate-50 px-6 py-4">
+                <h3 class="text-lg font-semibold text-slate-800 flex items-center">
+                    <i class="fas fa-calendar-alt text-indigo-500 mr-2"></i>Event Details
+                </h3>
+            </div>
+            <div class="p-6">
+                <dl class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <dt class="text-xs font-medium text-slate-500 uppercase tracking-wider">Event Title</dt>
+                        <dd class="text-base font-semibold text-slate-900">@Model.EventTitle</dd>
+                    </div>
+                    <div>
+                        <dt class="text-xs font-medium text-slate-500 uppercase tracking-wider">Location</dt>
+                        <dd class="text-base text-slate-700">@Model.EventLocation</dd>
+                    </div>
+                    <div class="md:col-span-2">
+                        <dt class="text-xs font-medium text-slate-500 uppercase tracking-wider">Date & Time</dt>
+                        <dd class="text-base text-slate-700">@Model.EventStartDate.ToString("dddd, MMMM dd, yyyy · h:mm tt")</dd>
+                    </div>
+                </dl>
+            </div>
+        </div>
+
+        <!-- Attendance Timeline Card -->
+        <div class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden mb-6">
+            <div class="border-b border-slate-100 bg-slate-50 px-6 py-4">
+                <h3 class="text-lg font-semibold text-slate-800 flex items-center">
+                    <i class="fas fa-clock text-indigo-500 mr-2"></i>Attendance Timeline
+                </h3>
+            </div>
+            <div class="p-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- Registration -->
+                    <div class="bg-slate-50 rounded-xl p-4 border border-slate-200">
+                        <div class="flex items-center text-slate-600 mb-2">
+                            <i class="fas fa-calendar-check text-indigo-500 w-5 mr-2"></i>
+                            <span class="text-sm font-medium uppercase tracking-wider">Registered</span>
+                        </div>
+                        <p class="text-base font-semibold text-slate-800">@Model.RegisteredAt.ToString("MMM dd, yyyy")</p>
+                        <p class="text-sm text-slate-600">@Model.RegisteredAt.ToString("h:mm tt")</p>
+                    </div>
+
+                    <!-- Check‑in -->
+                    <div class="bg-slate-50 rounded-xl p-4 border border-slate-200">
+                        <div class="flex items-center text-slate-600 mb-2">
+                            <i class="fas fa-sign-in-alt text-emerald-500 w-5 mr-2"></i>
+                            <span class="text-sm font-medium uppercase tracking-wider">Check‑in</span>
+                        </div>
+                        @if (Model.CheckedInAt.HasValue)
+                        {
+                            <p class="text-base font-semibold text-slate-800">@Model.CheckedInAt.Value.ToString("MMM dd, yyyy")</p>
+                            <p class="text-sm text-slate-600">@Model.CheckedInAt.Value.ToString("h:mm tt")</p>
+                        }
+                        else
+                        {
+                            <p class="text-base text-slate-400">—</p>
+                        }
+                    </div>
+
+                    <!-- Check‑out -->
+                    <div class="bg-slate-50 rounded-xl p-4 border border-slate-200">
+                        <div class="flex items-center text-slate-600 mb-2">
+                            <i class="fas fa-sign-out-alt text-amber-500 w-5 mr-2"></i>
+                            <span class="text-sm font-medium uppercase tracking-wider">Check‑out</span>
+                        </div>
+                        @if (Model.CheckedOutAt.HasValue)
+                        {
+                            <p class="text-base font-semibold text-slate-800">@Model.CheckedOutAt.Value.ToString("MMM dd, yyyy")</p>
+                            <p class="text-sm text-slate-600">@Model.CheckedOutAt.Value.ToString("h:mm tt")</p>
+                        }
+                        else
+                        {
+                            <p class="text-base text-slate-400">—</p>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+            @if (!Model.IsCheckedIn)
+            {
+                <form asp-action="Confirm" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@Model.RegistrationId" />
+                    <input type="hidden" name="action" value="checkin" />
+                    <button type="submit" class="w-full sm:w-auto px-8 py-3 bg-emerald-600 text-white rounded-xl font-medium hover:bg-emerald-700 transition shadow-md inline-flex items-center justify-center">
+                        <i class="fas fa-check-circle mr-2"></i>Confirm Check‑in
+                    </button>
+                </form>
+            }
+            else if (Model.IsCheckedIn && !Model.CheckedOutAt.HasValue)
+            {
+                <form asp-action="Confirm" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@Model.RegistrationId" />
+                    <input type="hidden" name="action" value="checkout" />
+                    <button type="submit" class="w-full sm:w-auto px-8 py-3 bg-amber-600 text-white rounded-xl font-medium hover:bg-amber-700 transition shadow-md inline-flex items-center justify-center">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Confirm Check‑out
+                    </button>
+                </form>
+            }
+            <a asp-action="Scan" class="w-full sm:w-auto px-8 py-3 bg-white border border-slate-300 text-slate-700 rounded-xl font-medium hover:bg-slate-50 transition shadow-sm inline-flex items-center justify-center">
+                <i class="fas fa-camera mr-2"></i>New Scan
+            </a>
+        </div>
+    </div>
+</div>

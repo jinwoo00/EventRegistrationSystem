@@ -34,5 +34,6 @@ namespace EventRegistrationSystem.ViewModel
         public DateTime? BirthDate { get; set; }
 
         public string Address { get; set; } = string.Empty;
+        public IFormFile? ProfilePicture { get; set; }
     }
 }
