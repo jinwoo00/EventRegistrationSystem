@@ -73,5 +73,7 @@ namespace EventRegistrationSystem.Controllers
                 return $"{parts[0][0]}{parts[1][0]}".ToUpper();
             return name.Length >= 2 ? name[..2].ToUpper() : name.ToUpper();
         }
+        [HttpGet("Ping")]
+        public IActionResult Ping() => Content("pong");
     }
 }

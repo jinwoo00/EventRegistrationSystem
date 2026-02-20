@@ -99,6 +99,14 @@
                     <i class="fas fa-certificate w-5 text-center"></i>
                     <span class="sidebar-text">Certificates</span>
                 </a>
+                <div class="pt-5 mt-2 border-t border-slate-200">
+                <div class="text-xs font-semibold uppercase text-slate-400 tracking-wider px-3 mb-2 sidebar-text">System</div>
+                    <a asp-controller="AuditLogs" asp-action="Index"
+                       class="flex items-center space-x-3 px-3 py-2.5 rounded-xl transition @(IsActive("AuditLogs") ? "bg-indigo-50 text-indigo-700" : "text-slate-600 hover:bg-slate-100")">
+                        <i class="fas fa-history w-5 text-center"></i>
+                        <span class="sidebar-text">Audit Logs</span>
+                    </a>
+                </div>
                 
 
                 <!-- RBAC Info -->

@@ -77,12 +77,12 @@ namespace EventRegistrationSystem.Controllers
                 {
                     // Create claims
                     var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, loggedInUser.Id.ToString()),
-                new Claim(ClaimTypes.Email, loggedInUser.Email),
-                new Claim(ClaimTypes.Name, loggedInUser.FullName ?? loggedInUser.Email),
-                new Claim("IsVerified", loggedInUser.IsVerified.ToString())
-            };
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, loggedInUser.Id.ToString()),
+                        new Claim(ClaimTypes.Email, loggedInUser.Email),
+                        new Claim(ClaimTypes.Name, loggedInUser.FullName ?? loggedInUser.Email),
+                        new Claim("IsVerified", loggedInUser.IsVerified.ToString())
+                    };
 
                     // Add roles
                     var roles = await _userManager.GetRolesAsync(loggedInUser);
@@ -181,10 +181,12 @@ namespace EventRegistrationSystem.Controllers
 
                 if (!success)
                 {
-                    // Registration failed for other reasons – you can add a generic error
                     ModelState.AddModelError("", "Registration failed. Please try again.");
                     return View(vm);
                 }
+
+                var newUser = await _userManager.FindByEmailAsync(vm.Email);
+                await _auditLogService.LogAsync(newUser, "Register", "New account created");
 
                 TempData["Success"] = "Registration successful! Please check your email for OTP.";
                 return RedirectToAction("VerifyOTP", new { email = vm.Email });
@@ -192,6 +194,7 @@ namespace EventRegistrationSystem.Controllers
             catch (Exception ex)
             {
                 // Log exception
+                _logger.LogError(ex, "Registration error");
                 ModelState.AddModelError("", "An unexpected error occurred.");
                 return View(vm);
             }
@@ -237,9 +240,6 @@ namespace EventRegistrationSystem.Controllers
                     OTP = vm.OTP?.Trim() ?? string.Empty
                 };
 
-                Console.WriteLine($"Attempting OTP verification for: {dto.Email}");
-                Console.WriteLine($"OTP provided: {dto.OTP}");
-
                 var success = await _service.VerifyOTPAsync(dto);
 
                 if (!success)
@@ -258,11 +258,15 @@ namespace EventRegistrationSystem.Controllers
                     return View(vm);
                 }
 
+                var verifiedUser = await _userManager.FindByEmailAsync(vm.Email);
+                await _auditLogService.LogAsync(verifiedUser, "VerifyOTP", "Email verified successfully");
+
                 TempData["Success"] = "Email verified successfully! You can now login.";
                 return RedirectToAction("Login", new { email = dto.Email });
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "OTP verification error");
                 TempData["Error"] = $"An error occurred: {ex.Message}";
                 return View(vm);
             }
@@ -317,6 +321,7 @@ namespace EventRegistrationSystem.Controllers
                         </div>"
                     );
 
+                    await _auditLogService.LogAsync(user, "ResendOTP", "OTP resent");
                     TempData["Success"] = "New OTP has been sent to your email.";
                 }
                 else
@@ -326,6 +331,7 @@ namespace EventRegistrationSystem.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Resend OTP error");
                 TempData["Error"] = $"Failed to resend OTP: {ex.Message}";
             }
 
@@ -337,6 +343,7 @@ namespace EventRegistrationSystem.Controllers
             // Can resend if OTP is expired or doesn't exist
             return !otpExpiry.HasValue || otpExpiry.Value <= DateTime.Now;
         }
+
         // GET: /Account/ForgotPassword
         [HttpGet]
         public IActionResult ForgotPassword()
@@ -373,6 +380,8 @@ namespace EventRegistrationSystem.Controllers
         <h1 style='color: #6366f1;'>{otp}</h1>
         <p>This code is valid for 10 minutes.</p>
         <p>If you did not request this, please ignore this email.</p>");
+
+            await _auditLogService.LogAsync(user, "ForgotPassword", "Password reset OTP sent");
 
             TempData["Success"] = "An OTP has been sent to your email.";
             return RedirectToAction(nameof(VerifyResetOtp), new { email = user.Email });
@@ -453,7 +462,10 @@ namespace EventRegistrationSystem.Controllers
 
             var result = await _userManager.ResetPasswordAsync(user, model.Token, model.Password);
             if (result.Succeeded)
+            {
+                await _auditLogService.LogAsync(user, "ResetPassword", "Password reset successfully");
                 return RedirectToAction(nameof(ResetPasswordConfirmation));
+            }
 
             foreach (var error in result.Errors)
                 ModelState.AddModelError("", error.Description);
@@ -468,7 +480,7 @@ namespace EventRegistrationSystem.Controllers
             return View();
         }
 
-        // Optional: Resend OTP
+        // POST: Resend Reset OTP
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ResendResetOtp(string email)
@@ -487,6 +499,8 @@ namespace EventRegistrationSystem.Controllers
 
             await _emailService.SendAsync(user.Email, "Password Reset OTP",
                 $"Your new OTP is: <b>{otp}</b>. Valid for 10 minutes.");
+
+            await _auditLogService.LogAsync(user, "ResendResetOtp", "Password reset OTP resent");
 
             TempData["Success"] = "A new OTP has been sent to your email.";
             return RedirectToAction(nameof(VerifyResetOtp), new { email = user.Email });

@@ -20,6 +20,7 @@ namespace EventRegistrationSystem.Controllers.Admin
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly ApplicationDbContext _context;
         private readonly ILogger<CertificateSendController> _logger;
+        private readonly IAuditLogService _auditLogService;
 
         public CertificateSendController(
             ICertificateRepository certRepo,
@@ -28,7 +29,8 @@ namespace EventRegistrationSystem.Controllers.Admin
             ILogger<CertificateSendController> logger,
             UserManager<ApplicationUser> userManager,
             IWebHostEnvironment webHostEnvironment,
-            ApplicationDbContext context)
+            ApplicationDbContext context,
+            IAuditLogService auditLogService)
         {
             _certRepo = certRepo;
             _eventRepo = eventRepo;
@@ -37,6 +39,7 @@ namespace EventRegistrationSystem.Controllers.Admin
             _webHostEnvironment = webHostEnvironment;
             _context = context;
             _logger = logger;
+            _auditLogService = auditLogService;
         }
 
         // GET: /Admin/Certificates/Send/Event/5
@@ -90,9 +93,16 @@ namespace EventRegistrationSystem.Controllers.Admin
             }
 
             var success = await _certRepo.UploadTemplateAsync(eventId, certificateFile.FileName, relativePath, userId);
-            TempData[success ? "Success" : "Error"] = success
-                ? "Certificate template uploaded successfully."
-                : "Failed to upload template.";
+            if (success)
+            {
+                var user = await _userManager.GetUserAsync(User);
+                await _auditLogService.LogAsync(user, "UploadTemplate", $"Uploaded certificate template for event {eventId}");
+                TempData["Success"] = "Certificate template uploaded successfully.";
+            }
+            else
+            {
+                TempData["Error"] = "Failed to upload template.";
+            }
 
             return RedirectToAction(nameof(Event), new { eventId });
         }
@@ -153,55 +163,12 @@ namespace EventRegistrationSystem.Controllers.Admin
             // Mark as sent
             await _certRepo.MarkCertificateSentAsync(registrationId, registration.User.Email);
 
+            var admin = await _userManager.GetUserAsync(User);
+            await _auditLogService.LogAsync(admin, "SendCertificate", $"Sent certificate to {registration.User.Email} for event {eventId}");
+
             TempData["Success"] = $"Certificate sent to {registration.User.Email}.";
             return RedirectToAction(nameof(Event), new { eventId });
         }
-
-        //// POST: SendBulk
-        //[HttpPost("SendBulk")]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> SendBulk(int eventId)
-        //{
-        //    var template = await _certRepo.GetTemplateByEventAsync(eventId);
-        //    if (template == null)
-        //    {
-        //        TempData["Error"] = "No certificate template found for this event.";
-        //        return RedirectToAction(nameof(Event), new { eventId });
-        //    }
-
-        //    var fullPath = Path.Combine(_webHostEnvironment.WebRootPath, template.FilePath.TrimStart('/'));
-        //    if (!System.IO.File.Exists(fullPath))
-        //    {
-        //        TempData["Error"] = "Certificate template file is missing.";
-        //        return RedirectToAction(nameof(Event), new { eventId });
-        //    }
-
-        //    // Delegate for sending email
-        //    async Task SendEmailAsync(string email, string eventTitle, string attendeeName, Stream templateStream)
-        //    {
-        //        var stampedPdf = PdfStamper.StampName(fullPath, attendeeName, logger: _logger);
-        //        // If you have stored coordinates in the event, use them:
-        //        // var stampedPdf = PdfStamper.StampName(fullPath, attendeeName, ev.CertificateX, ev.CertificateY, _logger);
-
-        //        await _emailService.SendWithAttachmentAsync(
-        //            email,
-        //            $"Your Certificate for {eventTitle}",
-        //            $@"
-        //<h2>Certificate of Attendance</h2>
-        //<p>Dear {attendeeName},</p>
-        //<p>Thank you for attending <strong>{eventTitle}</strong>.</p>
-        //<p>Please find your personalized certificate attached.</p>",
-        //            stampedPdf,
-        //            $"certificate-{attendeeName}.pdf",
-        //            "application/pdf"
-        //        );
-        //    }
-
-        //    var sentCount = await _certRepo.SendBulkCertificatesAsync(eventId, fullPath, SendEmailAsync);
-
-        //    TempData["Success"] = $"{sentCount} certificate(s) sent successfully.";
-        //    return RedirectToAction(nameof(Event), new { eventId });
-        //}
 
         // POST: DeleteTemplate
         [HttpPost("DeleteTemplate")]
@@ -209,9 +176,12 @@ namespace EventRegistrationSystem.Controllers.Admin
         public async Task<IActionResult> DeleteTemplate(int eventId)
         {
             await _certRepo.DeleteTemplateAsync(eventId);
+            var user = await _userManager.GetUserAsync(User);
+            await _auditLogService.LogAsync(user, "DeleteTemplate", $"Deleted certificate template for event {eventId}");
             TempData["Success"] = "Certificate template deleted.";
             return RedirectToAction(nameof(Event), new { eventId });
         }
+
         [HttpGet("Pending/{eventId}")]
         public async Task<IActionResult> Pending(int eventId)
         {
@@ -269,6 +239,9 @@ namespace EventRegistrationSystem.Controllers.Admin
                 _context.Certificates.Add(certificate);
                 await _context.SaveChangesAsync();
 
+                var admin = await _userManager.GetUserAsync(User);
+                await _auditLogService.LogAsync(admin, "ApproveCertificate", $"Approved certificate for registration {registrationId} (event {eventId})");
+
                 TempData["Success"] = $"Certificate approved for {registration.User.FullName ?? registration.User.Email}.";
             }
             catch (Exception ex)
@@ -325,6 +298,9 @@ namespace EventRegistrationSystem.Controllers.Admin
                 approved++;
             }
             await _context.SaveChangesAsync();
+
+            var admin = await _userManager.GetUserAsync(User);
+            await _auditLogService.LogAsync(admin, "ApproveAllCertificates", $"Approved {approved} certificates for event {eventId}");
 
             TempData["Success"] = $"{approved} certificate(s) approved successfully.";
             return RedirectToAction(nameof(Event), new { eventId });
