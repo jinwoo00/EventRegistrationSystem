@@ -106,7 +106,7 @@ namespace EventRegistrationSystem.Controllers
                         new ClaimsPrincipal(claimsIdentity),
                         authProperties);
 
-                    TempData["Success"] = $"Welcome back, {loggedInUser.FullName ?? "User"}!";
+                    //TempData["Success"] = $"Welcome back, {loggedInUser.FullName ?? "User"}!";
                     await _auditLogService.LogAsync(loggedInUser, "Login", "User logged in successfully");
 
                     // 👇 Role‑based redirect
@@ -118,7 +118,7 @@ namespace EventRegistrationSystem.Controllers
                         return RedirectToAction("Scan", "Staff");
                     else
                     {
-                        return RedirectToAction("Index", "User");
+                        return RedirectToAction("Dashboard", "User");
                     }
                 }
                 else

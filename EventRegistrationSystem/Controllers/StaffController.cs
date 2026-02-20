@@ -50,7 +50,9 @@ namespace EventRegistrationSystem.Controllers
                 RegisteredAt = registration.RegisteredAt,
                 IsCheckedIn = registration.IsCheckedIn,
                 CheckedInAt = registration.CheckedInAt,
-                CheckedOutAt = registration.CheckedOutAt
+                CheckedOutAt = registration.CheckedOutAt,
+                ProfilePictureUrl = registration.User?.ProfilePictureUrl
+
             };
 
             return View("~/Views/Staff/ConfirmScan.cshtml", viewModel);

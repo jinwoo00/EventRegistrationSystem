@@ -1,5 +1,6 @@
 ﻿using EventRegistrationSystem.Models;
 using EventRegistrationSystem.Repositories;
+using EventRegistrationSystem.ViewModel;
 using EventRegistrationSystem.ViewModel.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -76,6 +77,8 @@ namespace EventRegistrationSystem.Controllers
         public async Task<IActionResult> Dashboard()
         {
             var userId = _userManager.GetUserId(User);
+            var user = await _userManager.GetUserAsync(User);
+            var userName = user?.FullName ?? user?.UserName ?? "User";
             var registrations = await _regRepo.GetUserRegistrationsAsync(userId);
 
             var now = DateTime.Now;
@@ -90,14 +93,14 @@ namespace EventRegistrationSystem.Controllers
 
             var viewModel = new UserDashboardViewModel
             {
-                UserName = User.Identity?.Name ?? "User",
+                UserName = userName, // 👈 use the variable that contains full name
                 UpcomingEvents = upcoming.Take(3).ToList(),
                 PastEvents = past.Take(3).ToList(),
                 TotalEvents = registrations.Count,
                 AttendedCount = registrations.Count(r => r.IsCheckedIn),
                 UpcomingCount = upcoming.Count,
                 PastCount = past.Count,
-                CertificatesCount = await _certRepo.GetUserCertificateCountAsync(userId) // if available
+                CertificatesCount = await _certRepo.GetUserCertificateCountAsync(userId)
             };
             return View(viewModel);
         }
@@ -129,6 +132,110 @@ namespace EventRegistrationSystem.Controllers
             }
             memory.Position = 0;
             return File(memory, "application/pdf", $"certificate-{cert.CertificateNumber}.pdf");
+        }
+        [Authorize]
+        public async Task<IActionResult> Profile()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return NotFound();
+
+            var model = new UserProfileViewModel
+            {
+                Id = user.Id,
+                FullName = user.FullName,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
+                Gender = user.Gender,
+                BirthDate = user.BirthDate,
+                Address = user.Address,
+                ExistingProfilePictureUrl = user.ProfilePictureUrl
+            };
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Profile(UserProfileViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return NotFound();
+
+            // Update user properties
+            user.FullName = model.FullName;
+            user.Email = model.Email;
+            user.UserName = model.Email; // keep username in sync
+            user.PhoneNumber = model.PhoneNumber;
+            user.Gender = model.Gender;
+            user.BirthDate = model.BirthDate;
+            user.Address = model.Address;
+
+            // Handle profile picture upload
+            if (model.ProfilePicture != null && model.ProfilePicture.Length > 0)
+            {
+                var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", "profiles");
+                Directory.CreateDirectory(uploadsFolder);
+                var uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(model.ProfilePicture.FileName);
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await model.ProfilePicture.CopyToAsync(stream);
+                }
+
+                // Delete old picture if exists
+                if (!string.IsNullOrEmpty(user.ProfilePictureUrl))
+                {
+                    var oldFilePath = Path.Combine(_webHostEnvironment.WebRootPath, user.ProfilePictureUrl.TrimStart('/'));
+                    if (System.IO.File.Exists(oldFilePath))
+                        System.IO.File.Delete(oldFilePath);
+                }
+
+                user.ProfilePictureUrl = $"/uploads/profiles/{uniqueFileName}";
+            }
+
+            var result = await _userManager.UpdateAsync(user);
+            if (result.Succeeded)
+            {
+                TempData["Success"] = "Profile updated successfully.";
+                return RedirectToAction(nameof(Profile));
+            }
+
+            foreach (var error in result.Errors)
+                ModelState.AddModelError("", error.Description);
+
+            return View(model);
+        }
+
+        [HttpGet]
+        public IActionResult ChangePassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return NotFound();
+
+            var result = await _userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
+            if (result.Succeeded)
+            {
+                TempData["Success"] = "Password changed successfully.";
+                return RedirectToAction(nameof(Profile));
+            }
+
+            foreach (var error in result.Errors)
+                ModelState.AddModelError("", error.Description);
+
+            return View(model);
         }
     }
 }

@@ -34,12 +34,28 @@
                             <div><i class="fas fa-calendar-day w-5 text-indigo-500"></i> @reg.EventStartDate.ToString("dddd, MMM dd, yyyy · h:mm tt")</div>
                             <div><i class="fas fa-map-marker-alt w-5 text-amber-500"></i> @reg.EventLocation</div>
                             <div><i class="fas fa-clock w-5 text-emerald-500"></i> Registered: @reg.RegisteredAt.ToString("MMM dd")</div>
-                            <div>
+                            
+                            <!-- Status section: displays check‑in and check‑out -->
+                            <div class="mt-2">
                                 @if (reg.IsCheckedIn)
                                 {
-                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                        <i class="fas fa-check-circle mr-1"></i> Checked in @(reg.CheckedInAt?.ToString("h:mm tt") ?? "")
-                                    </span>
+                                    @if (!reg.CheckedOutAt.HasValue)
+                                    {
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                            <i class="fas fa-sign-in-alt mr-1"></i> Checked in @(reg.CheckedInAt?.ToString("h:mm tt") ?? "")
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <div>
+                                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                <i class="fas fa-sign-in-alt mr-1"></i> Checked in @(reg.CheckedInAt?.ToString("h:mm tt") ?? "")
+                                            </span>
+                                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600 ml-2">
+                                                <i class="fas fa-sign-out-alt mr-1"></i> Checked out @(reg.CheckedOutAt.Value.ToString("h:mm tt") ?? "")
+                                            </span>
+                                        </div>
+                                    }
                                 }
                                 else
                                 {

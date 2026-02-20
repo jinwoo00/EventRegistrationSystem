@@ -1,0 +1,64 @@
+﻿<!-- Logout Confirmation Modal -->
+<div id="logoutModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden transition-opacity" aria-hidden="true">
+    <div class="bg-white rounded-2xl shadow-xl max-w-md w-full mx-4 p-6 transform transition-all">
+        <div class="text-center">
+            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-amber-100 mb-4">
+                <i class="fas fa-sign-out-alt text-amber-600 text-xl"></i>
+            </div>
+            <h3 class="text-lg font-semibold text-slate-800 mb-2">Confirm Logout</h3>
+            <p class="text-sm text-slate-600 mb-6">Are you sure you want to log out? You will need to sign in again to access your account.</p>
+            <div class="flex gap-3 justify-center">
+                <button type="button" id="cancelLogout" class="px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition text-sm font-medium">
+                    Cancel
+                </button>
+                <button type="button" id="confirmLogout" class="px-4 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition text-sm font-medium">
+                    Logout
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const modal = document.getElementById('logoutModal');
+        const cancelBtn = document.getElementById('cancelLogout');
+        const confirmBtn = document.getElementById('confirmLogout');
+        let activeForm = null;
+
+        // Intercept all logout form submissions
+        document.querySelectorAll('form[action*="Logout"]').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                activeForm = this;
+                modal.classList.remove('hidden');
+            });
+        });
+
+        // Cancel button
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', function() {
+                modal.classList.add('hidden');
+                activeForm = null;
+            });
+        }
+
+        // Confirm button
+        if (confirmBtn) {
+            confirmBtn.addEventListener('click', function() {
+                if (activeForm) {
+                    activeForm.submit();
+                }
+                modal.classList.add('hidden');
+            });
+        }
+
+        // Close modal when clicking outside (optional)
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                modal.classList.add('hidden');
+                activeForm = null;
+            }
+        });
+    });
+</script>

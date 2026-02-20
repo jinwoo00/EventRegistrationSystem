@@ -24,16 +24,16 @@
             <div class="flex items-center justify-between">
                 <div class="flex items-center">
                     <a asp-controller="Home" asp-action="Index" class="text-2xl font-bold text-blue-700">
-                        <i class="fas fa-calendar-alt mr-2"></i>Event<span class="text-blue-500">Reg</span>
+                        <i class="fas fa-calendar-alt mr-2"></i>Event<span class="text-blue-500">Flow</span>
                     </a>
                 </div>
 
                 <!-- Desktop Menu -->
                 <div class="hidden md:flex items-center space-x-8">
-                    <a href="#features" class="text-gray-700 hover:text-blue-600 font-medium">Features</a>
+                    @* <a href="#features" class="text-gray-700 hover:text-blue-600 font-medium">Features</a>
                     <a href="#how-it-works" class="text-gray-700 hover:text-blue-600 font-medium">How It Works</a>
                     <a href="#testimonials" class="text-gray-700 hover:text-blue-600 font-medium">Testimonials</a>
-                    <a href="#contact" class="text-gray-700 hover:text-blue-600 font-medium">Contact</a>
+                    <a href="#contact" class="text-gray-700 hover:text-blue-600 font-medium">Contact</a> *@
 
                     @if (User.Identity?.IsAuthenticated ?? false)
                     {

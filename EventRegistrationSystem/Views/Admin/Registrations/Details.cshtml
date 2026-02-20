@@ -6,55 +6,128 @@
 }
 
 <div class="flex-1 overflow-y-auto dashboard-scroll bg-slate-50 p-6">
-    <div class="max-w-3xl mx-auto">
-        <div class="flex items-center justify-between mb-6">
-            <h1 class="text-2xl font-bold text-slate-800">Registration Details</h1>
-            <a asp-action="Index" class="bg-white border border-slate-300 text-slate-700 px-4 py-2 rounded-lg hover:bg-slate-50 inline-flex items-center">
-                <i class="fas fa-arrow-left mr-2"></i>Back
-            </a>
+    <div class="max-w-5xl mx-auto">
+
+        <!-- Gradient Header -->
+        <div class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-6 mb-8 shadow-lg">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-white">Registration Details</h1>
+                    <p class="text-indigo-100 mt-1">View full information for this registration.</p>
+                </div>
+                <a asp-action="Index" asp-route-eventId="@Model.EventId"
+                   class="bg-white text-indigo-700 px-5 py-2.5 rounded-xl font-medium hover:bg-indigo-50 transition shadow-md inline-flex items-center">
+                    <i class="fas fa-arrow-left mr-2"></i>Back to Registrations
+                </a>
+            </div>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-lg border border-slate-200 p-6">
-            <dl class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="col-span-2">
-                    <dt class="text-sm font-medium text-slate-500">Event</dt>
-                    <dd class="text-lg font-semibold text-slate-900">@Model.Event?.Title</dd>
+        <!-- Main Content Card -->
+        <div class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+            <div class="p-8">
+
+                <!-- Event Title -->
+                <div class="mb-6">
+                    <span class="text-xs font-medium text-slate-500 uppercase tracking-wider">Event</span>
+                    <h2 class="text-2xl font-bold text-slate-800">@Model.Event?.Title</h2>
                 </div>
-                <div>
-                    <dt class="text-sm font-medium text-slate-500">Attendee</dt>
-                    <dd class="text-base text-slate-800">@Model.User?.FullName</dd>
-                    <dd class="text-sm text-slate-600">@Model.User?.Email</dd>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Left Column: Attendee Info -->
+                    <div class="lg:col-span-2 space-y-6">
+                        <!-- Attendee Card -->
+                        <div class="bg-slate-50 rounded-xl p-5 border border-slate-200">
+                            <h3 class="text-lg font-semibold text-slate-800 mb-4 flex items-center">
+                                <i class="fas fa-user-circle text-indigo-500 mr-2"></i>Attendee Information
+                            </h3>
+                            <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <dt class="text-xs font-medium text-slate-500 uppercase tracking-wider">Full Name</dt>
+                                    <dd class="text-base font-medium text-slate-900">@(Model.User?.FullName ?? "N/A")</dd>
+                                </div>
+                                <div>
+                                    <dt class="text-xs font-medium text-slate-500 uppercase tracking-wider">Email</dt>
+                                    <dd class="text-base text-slate-700">@(Model.User?.Email ?? "N/A")</dd>
+                                </div>
+                                @if (!string.IsNullOrEmpty(Model.User?.PhoneNumber))
+                                {
+                                    <div>
+                                        <dt class="text-xs font-medium text-slate-500 uppercase tracking-wider">Phone</dt>
+                                        <dd class="text-base text-slate-700">@Model.User.PhoneNumber</dd>
+                                    </div>
+                                }
+                            </dl>
+                        </div>
+
+                        <!-- Ticket Card -->
+                        <div class="bg-slate-50 rounded-xl p-5 border border-slate-200">
+                            <h3 class="text-lg font-semibold text-slate-800 mb-4 flex items-center">
+                                <i class="fas fa-ticket-alt text-indigo-500 mr-2"></i>Ticket Information
+                            </h3>
+                            <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <dt class="text-xs font-medium text-slate-500 uppercase tracking-wider">Ticket Type</dt>
+                                    <dd class="text-base font-medium text-slate-900">@(Model.TicketType ?? "General")</dd>
+                                </div>
+                                @if (Model.Event?.Capacity.HasValue == true)
+                                {
+                                    <div>
+                                        <dt class="text-xs font-medium text-slate-500 uppercase tracking-wider">Event Capacity</dt>
+                                        <dd class="text-base text-slate-700">@Model.Event.Capacity</dd>
+                                    </div>
+                                }
+                            </dl>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Timeline -->
+                    <div class="space-y-6">
+                        <!-- Timeline Card -->
+                        <div class="bg-slate-50 rounded-xl p-5 border border-slate-200">
+                            <h3 class="text-lg font-semibold text-slate-800 mb-4 flex items-center">
+                                <i class="fas fa-calendar-alt text-indigo-500 mr-2"></i>Timeline
+                            </h3>
+                            <div class="space-y-4">
+                                <div class="flex items-start">
+                                    <div class="w-8 text-indigo-500">
+                                        <i class="fas fa-calendar-check"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-slate-700">Registered</p>
+                                        <p class="text-sm text-slate-600">@Model.RegisteredAt.ToString("dddd, MMMM dd, yyyy · h:mm tt")</p>
+                                    </div>
+                                </div>
+
+                                @if (Model.CheckedInAt.HasValue)
+                                {
+                                    <div class="flex items-start">
+                                        <div class="w-8 text-emerald-500">
+                                            <i class="fas fa-sign-in-alt"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-medium text-slate-700">Checked in</p>
+                                            <p class="text-sm text-slate-600">@Model.CheckedInAt.Value.ToString("dddd, MMMM dd, yyyy · h:mm tt")</p>
+                                        </div>
+                                    </div>
+                                }
+
+                                @if (Model.CheckedOutAt.HasValue)
+                                {
+                                    <div class="flex items-start">
+                                        <div class="w-8 text-amber-500">
+                                            <i class="fas fa-sign-out-alt"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-medium text-slate-700">Checked out</p>
+                                            <p class="text-sm text-slate-600">@Model.CheckedOutAt.Value.ToString("dddd, MMMM dd, yyyy · h:mm tt")</p>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <dt class="text-sm font-medium text-slate-500">Ticket Type</dt>
-                    <dd class="text-base text-slate-800">@Model.TicketType</dd>
-                </div>
-                <div>
-                    <dt class="text-sm font-medium text-slate-500">Registered At</dt>
-                    <dd class="text-base text-slate-800">@Model.RegisteredAt.ToString("dddd, MMMM dd, yyyy")</dd>
-                    <dd class="text-sm text-slate-600">@Model.RegisteredAt.ToString("h:mm tt")</dd>
-                </div>
-                <div>
-                    <dt class="text-sm font-medium text-slate-500">Check‑in Status</dt>
-                    <dd>
-                        @if (Model.IsCheckedIn)
-                        {
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                <span class="h-2 w-2 bg-green-500 rounded-full mr-2"></span>
-                                Checked in
-                            </span>
-                            <span class="block text-xs text-slate-500 mt-1">@Model.CheckedInAt?.ToString("MMM dd, h:mm tt")</span>
-                        }
-                        else
-                        {
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600">
-                                <span class="h-2 w-2 bg-slate-400 rounded-full mr-2"></span>
-                                Not checked in
-                            </span>
-                        }
-                    </dd>
-                </div>
-            </dl>
+            </div>
         </div>
     </div>
 </div>
